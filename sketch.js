@@ -1,14 +1,12 @@
-// Strategy Game Concept
+// Major Project
 // Therrill Strongarm
 // September 11, 2019
 //
 // Extra for Experts:
 // Classes
 // World Generation
-// Arrays
 // Vector2 Implementation
 // Perlin Noise
-// Grids
 
 
 class Vector2
@@ -237,27 +235,6 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
 }
 
-class General // Generals
-{
-  constructor(lvl, attack, defense, strategy, supply, isFieldMarshal)
-  {
-    this.lvl = lvl; // Their Level overall (0-10) | Field Marshall's Max Level is 15
-    this.attack = attack; // Their Attack Level (0-5) | Field Marshall (0-7)
-    this.defense = defense; // Their Defense Level (0-5) | Field Marshall (0-7)
-    this.strategy = strategy; // Their Strategy (0-5) | Field Marshall (0-7)
-    this.supply = supply; // Their Fuel Management (0-5) | Field Marshall (0-7)
-    this.isFieldMarshal = isFieldMarshal; // Determines whether it's a Field Marshal or a General
-  }
-  update()
-  {
-    this.render();
-  }
-  render()
-  {
-    // Nothing here yet!
-  }
-}
-
 class Aircraft // Air Units (Fighters, Bombers, CAS, Naval Bombers, Transports, etc)
 {
   constructor(hp)
@@ -300,37 +277,24 @@ let gameStarted;
 let menuScreen = "main";
 let generationType = "";
 
-// Songs
-let ausSong1, ausSong2, ausSong3, ausSong4, ausSong5, csaSong1, csaSong2, csaSong3, csaSong4, csaSong5, usaSong1, usaSong2, usaSong3, usaSong4, usaSong5;
-let warSong1, warSong2, menuSong;
+// Menu and War Songs
+let warSong1, menuSong;
+
+// Entente Songs
+
+// Third Internationale Songs
+
+// Reichpakt Songs
 
 // Symbols
 let nationalFocus;
 
 function preload() {
   nationalFocus = loadImage("assets/nationalFocus.png");
-  menuSong = loadSound("assets/sound/music/menusong.ogg") // Main Menu Song
-
-  //Preloading Music (War)
-  warSong1 = loadSound('assets/sound/music/war/war1.ogg'); // Amazing Grace
-  warSong2 = loadSound('assets/sound/music/war/war2.ogg'); // 1812 Overture Finale
   
-  //Preloading Music (2ACW)
-  ausSong1 = loadSound('assets/sound/music/2ACW/aus1.ogg'); // 71st Regiment (American Union State)
-  ausSong2 = loadSound('assets/sound/music/2ACW/aus2.ogg'); // American Salute
-  ausSong3 = loadSound('assets/sound/music/2ACW/aus3.ogg'); // Sound off
-  ausSong4 = loadSound('assets/sound/music/2ACW/aus4.ogg'); // Southern Melody
-  ausSong5 = loadSound('assets/sound/music/2ACW/aus5.ogg'); // Yellow Rose of Texas
-  csaSong1 = loadSound('assets/sound/music/2ACW/csa1.ogg'); // Banks of Marble (Combined Syndicates of America)
-  csaSong2 = loadSound('assets/sound/music/2ACW/csa2.ogg'); // Bread and Roses
-  csaSong3 = loadSound('assets/sound/music/2ACW/csa3.ogg'); // Solidarity Forever
-  csaSong4 = loadSound('assets/sound/music/2ACW/csa4.ogg'); // Two Good Men
-  csaSong5 = loadSound('assets/sound/music/2ACW/csa5.ogg'); // Which side are you on
-  usaSong1 = loadSound('assets/sound/music/2ACW/usa1.ogg'); // A dime from every dollar (United States of America)
-  usaSong2 = loadSound("assets/sound/music/2ACW/usa2.ogg"); // Marching Through Georgia
-  usaSong3 = loadSound("assets/sound/music/2ACW/usa3.ogg"); // Maryland March
-  usaSong4 = loadSound("assets/sound/music/2ACW/usa4.ogg"); // Praise the lord and pass the ammunition
-  usaSong5 = loadSound("assets/sound/music/2ACW/usa5.ogg"); // Yankee Doodle
+  //Preloading Music (Menu and War)
+  menuSong = loadSound("assets/sound/music/menusong.ogg") // Main Menu Song
+  warSong1 = loadSound('assets/sound/music/war/war1.ogg'); // 1812 Overture Finale
 }
 
 function getTwoDArray(x, y)
@@ -350,7 +314,6 @@ function setup() {
   gameStarted = true;
   generationType = "normal"
   startGame();
-  menuSong.play();
 }
 
 
