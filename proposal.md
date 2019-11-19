@@ -52,6 +52,6 @@ pop ups explaining the history.)
 - Expanded Interactive Battle System.
 - Possible Espionage System.
 - Formation of the Belgrade Pact against Bulgaria.
-- Formation of the Cairo Pact against the Ottomans
+- Formation of the Cairo Pact against the Ottomans.
 - Two Emirs enter (War between the Jabal Shammar and the Nejd.)
 - Russia announces her ambitions (Expansionism or Focus on revenge against the German Empire.)
