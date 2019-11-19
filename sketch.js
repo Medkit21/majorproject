@@ -233,6 +233,18 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
       sectors[this.index.x][this.index.y].update();
     }
   }
+  moveTo(x, y)
+  {
+    if (x >= 0 && x < 50 && y >= 0 && y < 50)
+    {
+      sectors[this.index.x][this.index.y].currentDivision = null;
+      sectors[this.index.x][this.index.y].update();
+      this.index.x = x;
+      this.index.y = y;
+      sectors[this.index.x][this.index.y].currentDivision = this;
+      sectors[this.index.x][this.index.y].update();
+    }
+  }
 }
 
 class Aircraft // Air Units (Fighters, Bombers, CAS, Naval Bombers, Transports, etc)
@@ -271,6 +283,7 @@ let sectors;
 let plusX;
 let cellSize;
 let currentSector;
+let currentUnitSelected;
 let divisions = [];
 
 let gameStarted;
@@ -402,10 +415,6 @@ function generateWorld() {
   }
 }
 
-// for every single sectors (IF ANYONE IS SEEING THIS IGNORE THIS)
-//   if sectors.x > half - a little || sectors.x < half + a little
-//     sectors.height -= 1 / (sectors.x - half) 
-
 function startGame () {
   sectors = getTwoDArray(50, 50);
   generateWorld();
@@ -422,8 +431,13 @@ function mousePressed() {
     let y = floor(mouseY / cellSize);
     print("x: " + x + " y: " + y);
 
-    if (x >= 0 && y >= 0 && x < 50 && y <50) {
+    if (currentUnitSelected != null) {
+      currentUnitSelected.moveTo(x, y);
+      currentUnitSelected = null;
+    }
+    else if (x >= 0 && y >= 0 && x < 50 && y <50) {
       currentSector = sectors[x][y];
+      currentUnitSelected = sectors[x][y].currentDivision;
       if (sectors[x][y].landType === "plains") {
         print("This is a plains sector");
       }
@@ -440,32 +454,10 @@ function mousePressed() {
         print("this is not land");
       }
     }
+    print(currentUnitSelected);
   }
 }
 
 function keyPressed() {
-  if (keyCode === RIGHT_ARROW) {
-    for (let i = 0; i < divisions.length; i++)
-    {
-      divisions[i].action("right");
-    }
-  }
-  else if (keyCode === LEFT_ARROW) {
-    for (let i = 0; i < divisions.length; i++)
-    {
-      divisions[i].action("left");
-    }
-  }
-  else if (keyCode === UP_ARROW) {
-    for (let i = 0; i < divisions.length; i++)
-    {
-      divisions[i].action("up");
-    }
-  }
-  else if (keyCode === DOWN_ARROW) {
-    for (let i = 0; i < divisions.length; i++)
-    {
-      divisions[i].action("down");
-    }
-  }
+
 }
