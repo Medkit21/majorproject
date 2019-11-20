@@ -87,7 +87,7 @@ class Sector // Template for a Sector
     else {
       fill(0, 0, 255);
     }
-    rect(this.position.x + plusX, this.position. y, this.size, this.size);
+    rect(this.position.x, this.position. y, this.size, this.size);
   }
 }
 
@@ -219,11 +219,11 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   render()
   {
     fill(0, 255, 255)
-    rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + 4, this.size, this.size);
+    rect(this.index.x * this.cellSize + 4, this.index.y * this.cellSize + 4, this.size, this.size);
   }
   move(x, y)
   {
-    if (this.index.x + x >= 0 && this.index.x + x < 50 && this.index.y + y >= 0 && this.index.y + y < 50 )
+    if (this.index.x + x >= 0 && this.index.x + x < 100 && this.index.y + y >= 0 && this.index.y + y < 50 )
     {
       sectors[this.index.x][this.index.y].currentDivision = null;
       sectors[this.index.x][this.index.y].update();
@@ -235,7 +235,7 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
   moveTo(x, y)
   {
-    if (x >= 0 && x < 50 && y >= 0 && y < 50)
+    if (x >= 0 && x < 100 && y >= 0 && y < 50)
     {
       sectors[this.index.x][this.index.y].currentDivision = null;
       sectors[this.index.x][this.index.y].update();
@@ -280,9 +280,9 @@ class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Conv
 }
 
 let sectors;
-let plusX;
 let cellSize;
 let currentSector;
+let currentSectorHovered;
 let currentUnitSelected;
 let divisions = [];
 
@@ -342,26 +342,12 @@ function windowResized() {
 
 // Draws the GUI
 function drawGUI() {
-  // Left side of the GUI
-  fill(0, 200, 200);
-  noStroke();
-  rect(0, 0, plusX - 1, windowHeight)
-  stroke(1);
-  fill(0);
-  textSize(20);
-  textAlign(LEFT);
-  fill(105,105,105);
-  rect(width - 355, 25, 325, 75);
-  imageMode(LEFT);
-  image(nationalFocus, width - 350, 35, 50, 50)
-  fill(255);
-  text("NO NATIONAL", width - 280, 60);
-  text("FOCUS SELECTED", width - 280, 80);
+
 }
 
 // Loads the Sectors on the Screen
 function loadSectors() {
-  for (let x = 0; x < 50; x++) {
+  for (let x = 0; x < 100; x++) {
     for (let y = 0; y < 50; y++) {
       sectors[x][y].update();
     }
@@ -371,10 +357,8 @@ function loadSectors() {
 
 // Generates the World
 function generateWorld() {
-  // let xoffset = random(-1000, 1000);
-  // let yoffset = random(-1000, 1000);
-  let xoffset = -457.95569479042;
-  let yoffset = 146.06481880215802;
+  let xoffset = random(-1000, 1000);
+  let yoffset = random(-1000, 1000);
   // noiseSeed(1); // Knock off Europe
   noiseSeed(29);
   console.log(xoffset, yoffset);
@@ -382,10 +366,9 @@ function generateWorld() {
     cellSize = height/50;
   }
   else if (height > width) {
-    cellSize = width/50;
+    cellSize = width/100;
   }
-  plusX = cellSize * 25;
-  for (let x = 0; x < 50; x++) {
+  for (let x = 0; x < 100; x++) {
     for (let y = 0; y < 50; y++) {
       let sectorVal = noise(x / 7 + xoffset, y / 7 + yoffset);
       let sectorType;
@@ -411,12 +394,12 @@ function generateWorld() {
 
   for (let i = 0; i < 100; i++)
   {
-    divisions.push(new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 50)), floor(random(0, 50)))));
+    divisions.push(new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 100)), floor(random(0, 50)))));
   }
 }
 
 function startGame () {
-  sectors = getTwoDArray(50, 50);
+  sectors = getTwoDArray(100, 50);
   generateWorld();
 
   background(0, 200, 200);
@@ -427,7 +410,7 @@ function startGame () {
 
 function mousePressed() {
   if (gameStarted) {
-    let x = floor((mouseX - plusX) / cellSize);
+    let x = floor((mouseX) / cellSize);
     let y = floor(mouseY / cellSize);
     print("x: " + x + " y: " + y);
 
@@ -435,7 +418,7 @@ function mousePressed() {
       currentUnitSelected.moveTo(x, y);
       currentUnitSelected = null;
     }
-    else if (x >= 0 && y >= 0 && x < 50 && y <50) {
+    else if (x >= 0 && y >= 0 && x < 100 && y <50) {
       currentSector = sectors[x][y];
       currentUnitSelected = sectors[x][y].currentDivision;
       if (sectors[x][y].landType === "plains") {
