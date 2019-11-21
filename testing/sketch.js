@@ -87,7 +87,7 @@ class Sector // Template for a Sector
     else {
       fill(0, 0, 255);
     }
-    rect(this.position.x, this.position. y, this.size, this.size);
+    rect(this.position.x + plusX, this.position.y + plusY, this.size, this.size);
   }
 }
 
@@ -219,11 +219,11 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   render()
   {
     fill(0, 255, 255)
-    rect(this.index.x * this.cellSize + 4, this.index.y * this.cellSize + 4, this.size, this.size);
+    rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + plusY + 4, this.size, this.size);
   }
   move(x, y)
   {
-    if (this.index.x + x >= 0 && this.index.x + x < 100 && this.index.y + y >= 0 && this.index.y + y < 50 )
+    if (this.index.x + x >= 0 && this.index.x + x < 111 && this.index.y + y >= 0 && this.index.y + y < 50 )
     {
       sectors[this.index.x][this.index.y].currentDivision = null;
       sectors[this.index.x][this.index.y].update();
@@ -235,7 +235,7 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
   moveTo(x, y)
   {
-    if (x >= 0 && x < 100 && y >= 0 && y < 50)
+    if (x >= 0 && x < 111 && y >= 0 && y < 50)
     {
       sectors[this.index.x][this.index.y].currentDivision = null;
       sectors[this.index.x][this.index.y].update();
@@ -289,6 +289,9 @@ let divisions = [];
 let gameStarted;
 let menuScreen = "main";
 let generationType = "";
+
+let plusX;
+let plusY;
 
 // Menu and War Songs
 let warSong1, menuSong;
@@ -347,7 +350,7 @@ function drawGUI() {
 
 // Loads the Sectors on the Screen
 function loadSectors() {
-  for (let x = 0; x < 100; x++) {
+  for (let x = 0; x < 111; x++) {
     for (let y = 0; y < 50; y++) {
       sectors[x][y].update();
     }
@@ -357,18 +360,20 @@ function loadSectors() {
 
 // Generates the World
 function generateWorld() {
-  let xoffset = random(-1000, 1000);
-  let yoffset = random(-1000, 1000);
-  // noiseSeed(1); // Knock off Europe
-  noiseSeed(29);
+  // let xoffset = random(-1000, 1000);
+  // let yoffset = random(-1000, 1000);
+  let xoffset = -104659;
+  let yoffset = 104659;
   console.log(xoffset, yoffset);
   if (width >= height) {
-    cellSize = height/50;
+    cellSize = height/55;
   }
   else if (height > width) {
     cellSize = width/100;
   }
-  for (let x = 0; x < 100; x++) {
+  plusY = cellSize * 4.8;
+  plusX = cellSize / 4;
+  for (let x = 0; x < 111; x++) {
     for (let y = 0; y < 50; y++) {
       let sectorVal = noise(x / 7 + xoffset, y / 7 + yoffset);
       let sectorType;
@@ -399,7 +404,7 @@ function generateWorld() {
 }
 
 function startGame () {
-  sectors = getTwoDArray(100, 50);
+  sectors = getTwoDArray(111, 50);
   generateWorld();
 
   background(0, 200, 200);
@@ -410,15 +415,15 @@ function startGame () {
 
 function mousePressed() {
   if (gameStarted) {
-    let x = floor((mouseX) / cellSize);
-    let y = floor(mouseY / cellSize);
+    let x = floor((mouseX - plusX) / cellSize);
+    let y = floor((mouseY - plusY) / cellSize);
     print("x: " + x + " y: " + y);
 
     if (currentUnitSelected != null) {
       currentUnitSelected.moveTo(x, y);
       currentUnitSelected = null;
     }
-    else if (x >= 0 && y >= 0 && x < 100 && y <50) {
+    else if (x >= 0 && y >= 0 && x < 111 && y <50) {
       currentSector = sectors[x][y];
       currentUnitSelected = sectors[x][y].currentDivision;
       if (sectors[x][y].landType === "plains") {
