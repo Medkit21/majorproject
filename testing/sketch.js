@@ -49,6 +49,7 @@ class Sector // Template for a Sector
     this.LocManpower; // Local Manpower
     this.buildLimit;
     this.currentDivision = null;
+    this.currentNavy = null;
 
     // Defense Buildables
     this.landForts; // Land Forts (0 - 10) | These increase a Sector's Defense against land units(infantry, tanks, etc.)
@@ -68,6 +69,10 @@ class Sector // Template for a Sector
     if (this.currentDivision != null)
     {
       this.currentDivision.update();
+    }
+    if (this.currentNavy != null)
+    {
+      this.currentNavy.update();
     }
   }
   render()
@@ -178,7 +183,7 @@ class Nation
 
 class Division // Land Units (Infantry, Cavalry, Tanks, etc)
 {
-  constructor(cellSize, size, mp, index)
+  constructor(cellSize, size, mp, index, divisionType)
   {
     this.cellSize = cellSize;
     //this.position = index.multiply(cellSize);
@@ -188,6 +193,7 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
     this.attack;
     this.defense;
     this.index = index;
+    this.divisionType = divisionType;
 
     if (sectors[index.x][index.y].landType !== "water") {
       sectors[index.x][index.y].currentDivision = this;
@@ -218,7 +224,7 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
   render()
   {
-    fill(0, 255, 255)
+    fill(0, 255, 0)
     rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + plusY + 4, this.size, this.size);
   }
   move(x, y)
@@ -265,9 +271,82 @@ class Aircraft // Air Units (Fighters, Bombers, CAS, Naval Bombers, Transports, 
 
 class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Convoys, etc)
 {
-  constructor(hp)
+  constructor(cellSize, size, index, navalcraftType, era)
   {
-    this.hp = hp;
+    this.cellSize = cellSize;
+    //this.position = index.multiply(cellSize);
+    this.size = size;
+    this.attack;
+    this.defense;
+    this.index = index;
+    this.navalcraftType = navalcraftType;
+    this.era = era;
+
+    if (sectors[index.x][index.y].landType === "water") {
+      sectors[index.x][index.y].currentNavy = this;
+    }
+  }
+  update()
+  {
+    this.render();
+  }
+  action(direction)
+  {
+    if (direction === "up") {
+      this.move(0, -1);
+      this.render();
+    }
+    else if (direction === "down") {
+      this.move(0, 1);
+      this.render();
+    }
+    else if (direction === "left") {
+      this.move(-1, 0);
+      this.render();
+    }
+    else if (direction === "right") {
+      this.move(1, 0);
+      this.render();
+    }
+  }
+  render()
+  {
+    fill(255,0,255)
+    rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + plusY + 4, this.size, this.size);
+  }
+  move(x, y)
+  {
+    if (this.index.x + x >= 0 && this.index.x + x < 111 && this.index.y + y >= 0 && this.index.y + y < 50 )
+    {
+      sectors[this.index.x][this.index.y].currentNavy = null;
+      sectors[this.index.x][this.index.y].update();
+      this.index.x += x;
+      this.index.y += y;
+      sectors[this.index.x][this.index.y].currentNavy = this;
+      sectors[this.index.x][this.index.y].update();
+    }
+  }
+  moveTo(x, y)
+  {
+    if (x >= 0 && x < 111 && y >= 0 && y < 50)
+    {
+      sectors[this.index.x][this.index.y].currentNavy = null;
+      sectors[this.index.x][this.index.y].update();
+      this.index.x = x;
+      this.index.y = y;
+      sectors[this.index.x][this.index.y].currentNavy = this;
+      sectors[this.index.x][this.index.y].update();
+    }
+  }
+}
+
+class Building
+{
+  constructor(size, buildingType, devastation)
+  {
+    this.size = size;
+    this.buildingType = buildingType;
+    this.devastation = devastation;
   }
   update()
   {
@@ -275,16 +354,17 @@ class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Conv
   }
   render()
   {
-    // Nothing here yet!
+    // Nothing just yet :D
   }
 }
-
 let sectors;
 let cellSize;
 let currentSector;
 let currentSectorHovered;
 let currentUnitSelected;
 let divisions = [];
+let navies = [];
+let buildings = [];
 
 let gameStarted;
 let menuScreen = "main";
@@ -397,9 +477,10 @@ function generateWorld() {
     }
   }
 
-  for (let i = 0; i < 100; i++)
+  for (let i = 0; i < 50; i++)
   {
-    divisions.push(new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 100)), floor(random(0, 50)))));
+    divisions.push(new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "infantry"));
+    navies.push(new Navalcraft(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "destroyer", "Weltkrieg"));
   }
 }
 
@@ -421,28 +502,42 @@ function mousePressed() {
 
     if (currentUnitSelected != null) {
       currentUnitSelected.moveTo(x, y);
+      if (sectors[x][y].currentDivision) {
+        print(currentUnitSelected.divisionType + " moved");
+      }
+      else {
+        print(currentUnitSelected.era, currentUnitSelected.navalcraftType + " moved");
+      }
       currentUnitSelected = null;
     }
     else if (x >= 0 && y >= 0 && x < 111 && y <50) {
       currentSector = sectors[x][y];
-      currentUnitSelected = sectors[x][y].currentDivision;
-      if (sectors[x][y].landType === "plains") {
-        print("This is a plains sector");
+      if (sectors[x][y].currentDivision) {
+        currentUnitSelected = sectors[x][y].currentDivision;
+        print(currentUnitSelected.divisionType + " selected");
       }
-      else if (sectors[x][y].landType === "forest") {
-        print("This is a forest sector");
+      else if (sectors[x][y].currentNavy) {
+        currentUnitSelected = sectors[x][y].currentNavy;
+        print(currentUnitSelected.era, currentUnitSelected.navalcraftType + " selected");
       }
-      else if (sectors[x][y].landType === "arid") {
-        print("This is a beach sector");
-      }
-      else if (sectors[x][y].landType === "jungle") {
-        print("This is a jungle sector");
-      }
-      else {
-        print("this is not land");
-      }
+
+      // if (sectors[x][y].landType === "plains") {
+      //   print("This is a plains sector");
+      // }
+      // else if (sectors[x][y].landType === "forest") {
+      //   print("This is a forest sector");
+      // }
+      // else if (sectors[x][y].landType === "arid") {
+      //   print("This is a beach sector");
+      // }
+      // else if (sectors[x][y].landType === "jungle") {
+      //   print("This is a jungle sector");
+      // }
+      // else {
+      //   print("this is not land");
+      // }
     }
-    print(currentUnitSelected);
+    // print(currentUnitSelected);
   }
 }
 
