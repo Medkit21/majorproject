@@ -502,11 +502,14 @@ function mousePressed() {
 
     if (currentUnitSelected != null) {
       currentUnitSelected.moveTo(x, y);
-      if (sectors[x][y].currentDivision) {
+      if (currentUnitSelected.divisionType !== null && sectors[x][y].landType !== 'water') {
         print(currentUnitSelected.divisionType + " moved");
+        currentUnitSelected.moveTo(x, y);
+        console.log('Moved')
       }
-      else {
+      else if(currentUnitSelected.navalCraftType !== null && sectors[x][y].landType === 'water') {
         print(currentUnitSelected.era, currentUnitSelected.navalcraftType + " moved");
+        currentUnitSelected.moveTo(x, y);
       }
       currentUnitSelected = null;
     }
