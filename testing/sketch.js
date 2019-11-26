@@ -51,12 +51,12 @@ class Sector // Template for a Sector
     this.currentDivision = null;
     this.currentNavy = null;
 
-    // Defense Buildables
+    // Buildables
     this.landForts; // Land Forts (0 - 10) | These increase a Sector's Defense against land units(infantry, tanks, etc.)
     this.waterForts; // Water Forts/Coastal Forts (0 - 5) | These increase a Sector's Defense against Naval Invasions.
     this.antiAir; // Anti Air Guns(AA Guns) (0 - 5) | These increase your Air Superiority and decreases your enemy's (It also destroys enemy aircraft.)
     this.airbases; // Airbases/Airports (0 - 6) | Where planes are stored and deployed from.
-    this.navalPorts; // Naval Ports (0 = 6) | Where Naval Units are stored and deployed from.
+    this.navalPorts = null; // Naval Ports (0 = 6) | Where Naval Units are stored and deployed from.
     this.navalDockyard; // Naval Dockyards (0 - Build Limit) | These are used to build Naval Units(Submarines, Convoys, Destroyers, Carriers, etc.)
     this.civFactories; // Civilian Factories (0 - Build Limit) | These are used to build buildings and manage trades. (Military Factories, Land Forts, etc.)
     this.milFactories; // Military Factories (0 - Build Limit) | These are used to produce equipment(Guns, Vehicles, Tanks, Artillery, Planes, etc.).
@@ -73,6 +73,10 @@ class Sector // Template for a Sector
     if (this.currentNavy != null)
     {
       this.currentNavy.update();
+    }
+    if (this.navalPorts != null)
+    {
+      this.navalPorts.update();
     }
   }
   render()
@@ -342,11 +346,18 @@ class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Conv
 
 class Building
 {
-  constructor(size, buildingType, devastation)
+  constructor(cellSize, size, index, buildingType, devastation, ammount)
   {
+    this.cellSize = cellSize;
     this.size = size;
+    this.index = index;
     this.buildingType = buildingType;
     this.devastation = devastation;
+    this.ammount = ammount;
+
+    if (sectors[index.x][index.y].landType === "beach") {
+      sectors[index.x][index.y].navalPorts = this;
+    }
   }
   update()
   {
@@ -354,7 +365,9 @@ class Building
   }
   render()
   {
-    // Nothing just yet :D
+    fill(0, 0, 100);
+    ellipseMode(CORNER);
+    ellipse(this.index.x * this.cellSize + plusX, this.index.y * this.cellSize + plusY, this.size);
   }
 }
 let sectors;
@@ -477,10 +490,11 @@ function generateWorld() {
     }
   }
 
-  for (let i = 0; i < 50; i++)
+  for (let i = 0; i < 100; i++)
   {
     divisions.push(new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "infantry"));
     navies.push(new Navalcraft(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "destroyer", "Weltkrieg"));
+    buildings.push(new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), 'navalPort', 0, 1));
   }
 }
 
@@ -494,6 +508,10 @@ function startGame () {
   gameStarted = true;
 }
 
+function nextTurn() {
+
+}
+
 function mousePressed() {
   if (gameStarted) {
     let x = floor((mouseX - plusX) / cellSize);
@@ -501,15 +519,16 @@ function mousePressed() {
     print("x: " + x + " y: " + y);
 
     if (currentUnitSelected != null) {
-      currentUnitSelected.moveTo(x, y);
-      if (currentUnitSelected.divisionType !== null && sectors[x][y].landType !== 'water') {
-        print(currentUnitSelected.divisionType + " moved");
-        currentUnitSelected.moveTo(x, y);
-        console.log('Moved')
-      }
-      else if(currentUnitSelected.navalCraftType !== null && sectors[x][y].landType === 'water') {
-        print(currentUnitSelected.era, currentUnitSelected.navalcraftType + " moved");
-        currentUnitSelected.moveTo(x, y);
+      if (sectors[x][y].currentDivision === null && sectors[x][y].currentNavy === null)
+      {
+        if (currentUnitSelected.divisionType !== undefined && sectors[x][y].landType !== 'water') {
+          print(currentUnitSelected.divisionType + " moved");
+          currentUnitSelected.moveTo(x, y);
+        }
+        else if(currentUnitSelected.navalcraftType !== undefined && sectors[x][y].landType === 'water') {
+          print(currentUnitSelected.era, currentUnitSelected.navalcraftType + " moved");
+          currentUnitSelected.moveTo(x, y);
+        }
       }
       currentUnitSelected = null;
     }
@@ -523,24 +542,7 @@ function mousePressed() {
         currentUnitSelected = sectors[x][y].currentNavy;
         print(currentUnitSelected.era, currentUnitSelected.navalcraftType + " selected");
       }
-
-      // if (sectors[x][y].landType === "plains") {
-      //   print("This is a plains sector");
-      // }
-      // else if (sectors[x][y].landType === "forest") {
-      //   print("This is a forest sector");
-      // }
-      // else if (sectors[x][y].landType === "arid") {
-      //   print("This is a beach sector");
-      // }
-      // else if (sectors[x][y].landType === "jungle") {
-      //   print("This is a jungle sector");
-      // }
-      // else {
-      //   print("this is not land");
-      // }
     }
-    // print(currentUnitSelected);
   }
 }
 
