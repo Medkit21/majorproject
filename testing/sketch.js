@@ -52,11 +52,11 @@ class Sector // Template for a Sector
     this.currentNavy = null;
 
     // Buildables
-    this.landForts; // Land Forts (0 - 10) | These increase a Sector's Defense against land units(infantry, tanks, etc.)
+    this.landForts = null;; // Land Forts (0 - 10) | These increase a Sector's Defense against land units(infantry, tanks, etc.)
     this.waterForts; // Water Forts/Coastal Forts (0 - 5) | These increase a Sector's Defense against Naval Invasions.
     this.antiAir; // Anti Air Guns(AA Guns) (0 - 5) | These increase your Air Superiority and decreases your enemy's (It also destroys enemy aircraft.)
     this.airbases; // Airbases/Airports (0 - 6) | Where planes are stored and deployed from.
-    this.navalPorts = null; // Naval Ports (0 = 6) | Where Naval Units are stored and deployed from.
+    this.navalPorts = null;
     this.navalDockyard; // Naval Dockyards (0 - Build Limit) | These are used to build Naval Units(Submarines, Convoys, Destroyers, Carriers, etc.)
     this.civFactories; // Civilian Factories (0 - Build Limit) | These are used to build buildings and manage trades. (Military Factories, Land Forts, etc.)
     this.milFactories; // Military Factories (0 - Build Limit) | These are used to produce equipment(Guns, Vehicles, Tanks, Artillery, Planes, etc.).
@@ -66,6 +66,14 @@ class Sector // Template for a Sector
   update()
   {
     this.render();
+    if (this.navalPorts != null)
+    {
+      this.navalPorts.update();
+    }
+    if (this.landForts != null)
+    {
+      this.landForts.update();
+    }
     if (this.currentDivision != null)
     {
       this.currentDivision.update();
@@ -73,10 +81,6 @@ class Sector // Template for a Sector
     if (this.currentNavy != null)
     {
       this.currentNavy.update();
-    }
-    if (this.navalPorts != null)
-    {
-      this.navalPorts.update();
     }
   }
   render()
@@ -87,7 +91,7 @@ class Sector // Template for a Sector
     else if (this.landType === "forest") {
       fill(34,139,34);
     }
-    else if (this.landType === "arid") {
+    else if (this.landType === "beach") {
       fill(210, 180, 140);
     }
     else if (this.landType === "jungle") {
@@ -228,8 +232,11 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
   render()
   {
-    fill(0, 255, 0)
-    rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + plusY + 4, this.size, this.size);
+    if(!sectors[this.index.x][this.index.y].landForts)
+    {
+      fill(0, 255, 0)
+      rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + plusY + 4, this.size, this.size);
+    }
   }
   move(x, y)
   {
@@ -355,8 +362,15 @@ class Building
     this.devastation = devastation;
     this.ammount = ammount;
 
-    if (sectors[index.x][index.y].landType === "beach") {
-      sectors[index.x][index.y].navalPorts = this;
+    if (this.buildingType === 'navalPort') {
+      if (sectors[index.x][index.y].landType === "beach") {
+        sectors[index.x][index.y].navalPorts = this;
+      }
+    }
+    if (this.buildingType === 'landFort') {
+      if (sectors[index.x][index.y].landType !== "beach" && sectors[index.x][index.y].landType !== "water") {
+        sectors[index.x][index.y].landForts = this;
+      }
     }
   }
   update()
@@ -365,9 +379,25 @@ class Building
   }
   render()
   {
-    fill(0, 0, 100);
-    ellipseMode(CORNER);
-    ellipse(this.index.x * this.cellSize + plusX, this.index.y * this.cellSize + plusY, this.size);
+    if(this.buildingType === 'navalPort') {
+      fill(0, 0, 255);
+      ellipseMode(CORNER);
+      ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+    }
+    else if(this.buildingType === 'landFort') {
+      if (sectors[this.index.x][this.index.y].currentDivision === null)
+      {
+        fill(255);
+        ellipseMode(CORNER);
+        ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+      }
+      else
+      {
+        fill(0, 255, 0);
+        ellipseMode(CORNER);
+        ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+      }
+    }
   }
 }
 let sectors;
@@ -378,6 +408,8 @@ let currentUnitSelected;
 let divisions = [];
 let navies = [];
 let buildings = [];
+
+const randBuilding = ['navalPort', 'landFort'];
 
 let gameStarted;
 let menuScreen = "main";
@@ -476,7 +508,7 @@ function generateWorld() {
       }
       else if (sectorVal < 0.4)
       {
-        sectorType = 'arid';
+        sectorType = 'beach';
       }
       else if (sectorVal < 0.55)
       {
@@ -489,12 +521,14 @@ function generateWorld() {
       sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, sectorType, random());
     }
   }
-
   for (let i = 0; i < 100; i++)
   {
     divisions.push(new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "infantry"));
     navies.push(new Navalcraft(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "destroyer", "Weltkrieg"));
-    buildings.push(new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), 'navalPort', 0, 1));
+  }
+  for (let i = 0; i < 1000; i++)
+  {
+    buildings.push(new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), randBuilding[floor(random(0, randBuilding.length))], 0, 1));
   }
 }
 
