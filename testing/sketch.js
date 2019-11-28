@@ -104,86 +104,21 @@ class Sector // Template for a Sector
   }
 }
 
-class Nation 
+class Group 
 {
-  constructor(name, isPuppet)
+  constructor(name, color)
   {
     this.name = name;
-    this.isPuppet = isPuppet;
-    this.setGovernment;
-    this.puppetMasterIdeology;
-
-    // Ideology Percentages
-    this.democracy;
-    this.natPop;
-    this.communism;
-    this.monarchism;
-
-    // Nation Stats
-    this.politicalPower; // Politcal Power is used for decisions and national focuses
-    this.stability;
-    this.warSupport; // How much the population supports the war | Higher war support will generate higher manpower
-    this.manpower; // Displays how much of the population is recruitable
-    this.numOfFactories; // Displays the number of total factories you control
-    this.fuel; // Displays how much fuel you have
-
-    // Nation Resources
-    this.ideology; // Converted into Fuel for the Nation
-    this.aluminum; // Used for Aircraft and Support Equipment
-    this.rubber; // Used for Aircraft, Motorized and Mechanized Vehicles, and Artillery
-    this.tungsten; // Used for Artillery, Medium Tanks, Light and Medium SP Artillery, Tank Destroyers, Medium SP Anti-Air and Jet Aircraft
-    this.steel; // Used for Infantry Weapons and Support Equipment, Artillery, Anti-air, Anti-tank, Ships, Tanks and Motorized/Mechanized Vehicles
-    this.chromium; // Used for Heavy and Super Heavy Tanks, Large Ships and Level 4 Small Ships
-
-    if(this.isPuppet) 
-    {
-      this.ideologyAssignment(puppetMasterIdeology);
-    }
-    else
-    {
-      this.ideologyAssignment("rand");
-    }
-  }
-  ideologyAssignment(newIdeology) // This will only ever be called once at the beginning or the formation of new Nations
-  {
-    this.newIdeology = newIdeology;
-    if (newIdeology === "rand") {
-      this.ideology = floor(random(1, 101));
-      if (this.ideology <= 25) {
-        this.setGovernment = "democracy";
-        this.democracy = floor(random(50, 61));
-        this.natPop = floor(random(0 - this.democracy));
-        this.communism = floor(random(0 - this.natPop));
-        this.monarchism = floor(random(this.communism - 1));
-      }
-      else if (this.ideology <= 50) {
-        this.setGovernment = "natpop";
-        this.natPop = floor(random(50, 61));
-        this.democracy = floor(random(0 - this.natPop));
-        this.communism = floor(random(0 - this.democracy));
-        this.monarchism = floor(random(this.communism - 1));
-      }
-      else if (this.ideology <= 75) {
-        this.setGovernment = "communism";
-        this.communism = floor(random(50, 61));
-        this.democracy = floor(random(0 - this.communism));
-        this.natPop = floor(random(0 - this.democracy));
-        this.monarchism = floor(random(this.natPop - 1));
-      }
-      else {
-        this.setGovernment = "monarchism";
-        this.monarchism = floor(random(50, 61));
-        this.democracy = floor(random(0 - this.monarchism));
-        this.natPop = floor(random(0 - this.democracy));
-        this.communism = floor(random(this.natPop - 1));
-      }
-    }
+    this.color = color;
+    
+    // Resources
+    this.wood;
+    this.stone;
+    this.metal;
+    this.food;
+    this.gold;
   }
   update()
-  {
-    this.render();
-  }
-  render()
   {
 
   }
@@ -264,25 +199,9 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
 }
 
-class Aircraft // Air Units (Fighters, Bombers, CAS, Naval Bombers, Transports, etc)
-{
-  constructor(hp)
-  {
-    this.hp = hp;
-  }
-  update()
-  {
-    this.render();
-  }
-  render()
-  {
-    // Nothing here yet!
-  }
-}
-
 class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Convoys, etc)
 {
-  constructor(cellSize, size, index, navalcraftType, era)
+  constructor(cellSize, size, index, navalcraftType)
   {
     this.cellSize = cellSize;
     //this.position = index.multiply(cellSize);
@@ -409,6 +328,8 @@ let divisions = [];
 let navies = [];
 let buildings = [];
 
+let era;
+
 const randBuilding = ['navalPort', 'landFort'];
 
 let gameStarted;
@@ -524,7 +445,7 @@ function generateWorld() {
   for (let i = 0; i < 100; i++)
   {
     divisions.push(new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "infantry"));
-    navies.push(new Navalcraft(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "destroyer", "Weltkrieg"));
+    navies.push(new Navalcraft(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "destroyer"));
   }
   for (let i = 0; i < 1000; i++)
   {
@@ -560,7 +481,7 @@ function mousePressed() {
           currentUnitSelected.moveTo(x, y);
         }
         else if(currentUnitSelected.navalcraftType !== undefined && sectors[x][y].landType === 'water') {
-          print(currentUnitSelected.era, currentUnitSelected.navalcraftType + " moved");
+          print(currentUnitSelected.navalcraftType + " moved");
           currentUnitSelected.moveTo(x, y);
         }
       }
@@ -574,7 +495,7 @@ function mousePressed() {
       }
       else if (sectors[x][y].currentNavy) {
         currentUnitSelected = sectors[x][y].currentNavy;
-        print(currentUnitSelected.era, currentUnitSelected.navalcraftType + " selected");
+        print(currentUnitSelected.navalcraftType + " selected");
       }
     }
   }
