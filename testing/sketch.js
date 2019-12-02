@@ -241,8 +241,11 @@ class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Conv
   }
   render()
   {
-    fill(255,0,255)
-    rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + plusY + 4, this.size, this.size);
+    if(!sectors[this.index.x][this.index.y].navalPorts)
+    {
+      fill(255,0,255)
+      rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + plusY + 4, this.size, this.size);
+    }
   }
   move(x, y)
   {
@@ -299,9 +302,18 @@ class Building
   render()
   {
     if(this.buildingType === 'navalPort') {
-      fill(0, 0, 255);
-      ellipseMode(CORNER);
-      ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+      if (sectors[this.index.x][this.index.y].currentNavy === null)
+      {
+        fill(0, 0, 255);
+        ellipseMode(CORNER);
+        ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+      }
+      else
+      {
+        fill(255,0,255);
+        ellipseMode(CORNER);
+        ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+      }
     }
     else if(this.buildingType === 'landFort') {
       if (sectors[this.index.x][this.index.y].currentDivision === null)
@@ -476,7 +488,7 @@ function mousePressed() {
     if (currentUnitSelected != null) {
       if (sectors[x][y].currentDivision === null && sectors[x][y].currentNavy === null)
       {
-        if (currentUnitSelected.divisionType !== undefined && sectors[x][y].landType !== 'water') {
+        if (currentUnitSelected.divisionType !== undefined && sectors[x][y].landType !== 'water' || sectors[x][y].navalPorts != null) {
           print(currentUnitSelected.divisionType + " moved");
           currentUnitSelected.moveTo(x, y);
         }
