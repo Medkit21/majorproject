@@ -52,14 +52,8 @@ class Sector // Template for a Sector
     this.currentNavy = null;
 
     // Buildables
-    this.landForts = null;; // Land Forts (0 - 10) | These increase a Sector's Defense against land units(infantry, tanks, etc.)
-    this.waterForts; // Water Forts/Coastal Forts (0 - 5) | These increase a Sector's Defense against Naval Invasions.
-    this.antiAir; // Anti Air Guns(AA Guns) (0 - 5) | These increase your Air Superiority and decreases your enemy's (It also destroys enemy aircraft.)
-    this.airbases; // Airbases/Airports (0 - 6) | Where planes are stored and deployed from.
+    this.landForts = null;
     this.navalPorts = null;
-    this.navalDockyard; // Naval Dockyards (0 - Build Limit) | These are used to build Naval Units(Submarines, Convoys, Destroyers, Carriers, etc.)
-    this.civFactories; // Civilian Factories (0 - Build Limit) | These are used to build buildings and manage trades. (Military Factories, Land Forts, etc.)
-    this.milFactories; // Military Factories (0 - Build Limit) | These are used to produce equipment(Guns, Vehicles, Tanks, Artillery, Planes, etc.).
 
     this.landType = landType;
   }
@@ -104,26 +98,6 @@ class Sector // Template for a Sector
   }
 }
 
-class Group 
-{
-  constructor(name, color)
-  {
-    this.name = name;
-    this.color = color;
-    
-    // Resources
-    this.wood;
-    this.stone;
-    this.metal;
-    this.food;
-    this.gold;
-  }
-  update()
-  {
-
-  }
-}
-
 class Division // Land Units (Infantry, Cavalry, Tanks, etc)
 {
   constructor(cellSize, size, mp, index, divisionType)
@@ -141,6 +115,10 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
     if (sectors[index.x][index.y].landType !== "water") {
       sectors[index.x][index.y].currentDivision = this;
     }
+  }
+  shouldAdd()
+  {
+    return sectors[this.index.x][this.index.y].currentDivision === this;
   }
   update()
   {
@@ -210,11 +188,14 @@ class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Conv
     this.defense;
     this.index = index;
     this.navalcraftType = navalcraftType;
-    this.era = era;
 
     if (sectors[index.x][index.y].landType === "water") {
       sectors[index.x][index.y].currentNavy = this;
     }
+  }
+  shouldAdd()
+  {
+    return sectors[this.index.x][this.index.y].currentNavy === this;
   }
   update()
   {
@@ -275,7 +256,7 @@ class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Conv
 
 class Building
 {
-  constructor(cellSize, size, index, buildingType, devastation, ammount)
+  constructor(cellSize, size, index, buildingType, devastation, ammount, color)
   {
     this.cellSize = cellSize;
     this.size = size;
@@ -283,6 +264,7 @@ class Building
     this.buildingType = buildingType;
     this.devastation = devastation;
     this.ammount = ammount;
+    this.color = color;
 
     if (this.buildingType === 'navalPort') {
       if (sectors[index.x][index.y].landType === "beach") {
@@ -339,8 +321,7 @@ let currentUnitSelected;
 let divisions = [];
 let navies = [];
 let buildings = [];
-
-let era;
+let settlements = [];
 
 const randBuilding = ['navalPort', 'landFort'];
 
@@ -456,12 +437,20 @@ function generateWorld() {
   }
   for (let i = 0; i < 100; i++)
   {
-    divisions.push(new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "infantry"));
-    navies.push(new Navalcraft(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "destroyer"));
+    let div = new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "infantry")
+    if (div.shouldAdd())
+    {
+      divisions.push(div);
+    }
+    let navy = new Navalcraft(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "destroyer");
+    if (navy.shouldAdd())
+    {
+      navies.push(navy);
+    }
   }
   for (let i = 0; i < 1000; i++)
   {
-    buildings.push(new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), randBuilding[floor(random(0, randBuilding.length))], 0, 1));
+    buildings.push(new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), randBuilding[floor(random(0, randBuilding.length))], 0, 1, (0, 0, 0)));
   }
 }
 
