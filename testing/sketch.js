@@ -59,6 +59,7 @@ class Sector // Template for a Sector
   }
   update()
   {
+
     this.render();
     if (this.navalPorts != null)
     {
@@ -309,7 +310,7 @@ class Building
         fill(0, 255, 0);
         ellipseMode(CORNER);
         ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
-      }
+      } 
     }
   }
 }
@@ -334,12 +335,6 @@ let plusY;
 
 // Menu and War Songs
 let warSong1, menuSong;
-
-// Entente Songs
-
-// Third Internationale Songs
-
-// Reichpakt Songs
 
 // Symbols
 let nationalFocus;
@@ -371,7 +366,6 @@ function setup() {
   startGame();
 }
 
-
 function draw() {
   drawGUI();
 }
@@ -395,7 +389,6 @@ function loadSectors() {
     }
   }
 }
-
 
 // Generates the World
 function generateWorld() {
