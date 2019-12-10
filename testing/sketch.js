@@ -46,10 +46,10 @@ class Sector // Template for a Sector
     this.size = size;
     this.infrastructure;
     this.defense;
-    this.LocManpower; // Local Manpower
     this.buildLimit;
     this.currentDivision = null;
     this.currentNavy = null;
+    this.settlement = null;
 
     // Buildables
     this.landForts = null;
@@ -277,6 +277,12 @@ class Building
         sectors[index.x][index.y].landForts = this;
       }
     }
+    if (this.buildingType === 'settlement') {
+      if (sectors[index.x][index.y].landType !== "beach" && sectors[index.x][index.y].landType !== "water") {
+        sectors[index.x][index.y].settlement = this;
+      }
+      
+    }
   }
   update()
   {
@@ -341,10 +347,6 @@ let nationalFocus;
 
 function preload() {
   nationalFocus = loadImage("assets/nationalFocus.png");
-  
-  //Preloading Music (Menu and War)
-  menuSong = loadSound("assets/sound/music/menusong.ogg") // Main Menu Song
-  warSong1 = loadSound('assets/sound/music/war/war1.ogg'); // 1812 Overture Finale
 }
 
 function getTwoDArray(x, y)

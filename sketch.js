@@ -49,25 +49,33 @@ class Sector // Template for a Sector
     this.LocManpower; // Local Manpower
     this.buildLimit;
     this.currentDivision = null;
+    this.currentNavy = null;
 
-    // Defense Buildables
-    this.landForts; // Land Forts (0 - 10) | These increase a Sector's Defense against land units(infantry, tanks, etc.)
-    this.waterForts; // Water Forts/Coastal Forts (0 - 5) | These increase a Sector's Defense against Naval Invasions.
-    this.antiAir; // Anti Air Guns(AA Guns) (0 - 5) | These increase your Air Superiority and decreases your enemy's (It also destroys enemy aircraft.)
-    this.airbases; // Airbases/Airports (0 - 6) | Where planes are stored and deployed from.
-    this.navalPorts; // Naval Ports (0 = 6) | Where Naval Units are stored and deployed from.
-    this.navalDockyard; // Naval Dockyards (0 - Build Limit) | These are used to build Naval Units(Submarines, Convoys, Destroyers, Carriers, etc.)
-    this.civFactories; // Civilian Factories (0 - Build Limit) | These are used to build buildings and manage trades. (Military Factories, Land Forts, etc.)
-    this.milFactories; // Military Factories (0 - Build Limit) | These are used to produce equipment(Guns, Vehicles, Tanks, Artillery, Planes, etc.).
+    // Buildables
+    this.landForts = null;
+    this.navalPorts = null;
 
     this.landType = landType;
   }
   update()
   {
+
     this.render();
+    if (this.navalPorts != null)
+    {
+      this.navalPorts.update();
+    }
+    if (this.landForts != null)
+    {
+      this.landForts.update();
+    }
     if (this.currentDivision != null)
     {
       this.currentDivision.update();
+    }
+    if (this.currentNavy != null)
+    {
+      this.currentNavy.update();
     }
   }
   render()
@@ -78,7 +86,7 @@ class Sector // Template for a Sector
     else if (this.landType === "forest") {
       fill(34,139,34);
     }
-    else if (this.landType === "arid") {
+    else if (this.landType === "beach") {
       fill(210, 180, 140);
     }
     else if (this.landType === "jungle") {
@@ -87,98 +95,13 @@ class Sector // Template for a Sector
     else {
       fill(0, 0, 255);
     }
-    rect(this.position.x + plusX, this.position. y, this.size, this.size);
-  }
-}
-
-class Nation 
-{
-  constructor(name, isPuppet)
-  {
-    this.name = name;
-    this.isPuppet = isPuppet;
-    this.setGovernment;
-    this.puppetMasterIdeology;
-
-    // Ideology Percentages
-    this.democracy;
-    this.natPop;
-    this.communism;
-    this.monarchism;
-
-    // Nation Stats
-    this.politicalPower; // Politcal Power is used for decisions and national focuses
-    this.stability;
-    this.warSupport; // How much the population supports the war | Higher war support will generate higher manpower
-    this.manpower; // Displays how much of the population is recruitable
-    this.numOfFactories; // Displays the number of total factories you control
-    this.fuel; // Displays how much fuel you have
-
-    // Nation Resources
-    this.ideology; // Converted into Fuel for the Nation
-    this.aluminum; // Used for Aircraft and Support Equipment
-    this.rubber; // Used for Aircraft, Motorized and Mechanized Vehicles, and Artillery
-    this.tungsten; // Used for Artillery, Medium Tanks, Light and Medium SP Artillery, Tank Destroyers, Medium SP Anti-Air and Jet Aircraft
-    this.steel; // Used for Infantry Weapons and Support Equipment, Artillery, Anti-air, Anti-tank, Ships, Tanks and Motorized/Mechanized Vehicles
-    this.chromium; // Used for Heavy and Super Heavy Tanks, Large Ships and Level 4 Small Ships
-
-    if(this.isPuppet) 
-    {
-      this.ideologyAssignment(puppetMasterIdeology);
-    }
-    else
-    {
-      this.ideologyAssignment("rand");
-    }
-  }
-  ideologyAssignment(newIdeology) // This will only ever be called once at the beginning or the formation of new Nations
-  {
-    this.newIdeology = newIdeology;
-    if (newIdeology === "rand") {
-      this.ideology = floor(random(1, 101));
-      if (this.ideology <= 25) {
-        this.setGovernment = "democracy";
-        this.democracy = floor(random(50, 61));
-        this.natPop = floor(random(0 - this.democracy));
-        this.communism = floor(random(0 - this.natPop));
-        this.monarchism = floor(random(this.communism - 1));
-      }
-      else if (this.ideology <= 50) {
-        this.setGovernment = "natpop";
-        this.natPop = floor(random(50, 61));
-        this.democracy = floor(random(0 - this.natPop));
-        this.communism = floor(random(0 - this.democracy));
-        this.monarchism = floor(random(this.communism - 1));
-      }
-      else if (this.ideology <= 75) {
-        this.setGovernment = "communism";
-        this.communism = floor(random(50, 61));
-        this.democracy = floor(random(0 - this.communism));
-        this.natPop = floor(random(0 - this.democracy));
-        this.monarchism = floor(random(this.natPop - 1));
-      }
-      else {
-        this.setGovernment = "monarchism";
-        this.monarchism = floor(random(50, 61));
-        this.democracy = floor(random(0 - this.monarchism));
-        this.natPop = floor(random(0 - this.democracy));
-        this.communism = floor(random(this.natPop - 1));
-      }
-    }
-  }
-  update()
-  {
-    this.render();
-  }
-  render()
-  {
-
+    rect(this.position.x + plusX, this.position.y + plusY, this.size, this.size);
   }
 }
 
 class Division // Land Units (Infantry, Cavalry, Tanks, etc)
 {
-  constructor(cellSize, size, mp, index)
+  constructor(cellSize, size, mp, index, divisionType)
   {
     this.cellSize = cellSize;
     //this.position = index.multiply(cellSize);
@@ -188,10 +111,15 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
     this.attack;
     this.defense;
     this.index = index;
+    this.divisionType = divisionType;
 
     if (sectors[index.x][index.y].landType !== "water") {
       sectors[index.x][index.y].currentDivision = this;
     }
+  }
+  shouldAdd()
+  {
+    return sectors[this.index.x][this.index.y].currentDivision === this;
   }
   update()
   {
@@ -218,12 +146,15 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
   render()
   {
-    fill(0, 255, 255)
-    rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + 4, this.size, this.size);
+    if(!sectors[this.index.x][this.index.y].landForts)
+    {
+      fill(0, 255, 0)
+      rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + plusY + 4, this.size, this.size);
+    }
   }
   move(x, y)
   {
-    if (this.index.x + x >= 0 && this.index.x + x < 50 && this.index.y + y >= 0 && this.index.y + y < 50 )
+    if (this.index.x + x >= 0 && this.index.x + x < 111 && this.index.y + y >= 0 && this.index.y + y < 50 )
     {
       sectors[this.index.x][this.index.y].currentDivision = null;
       sectors[this.index.x][this.index.y].update();
@@ -235,7 +166,7 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
   moveTo(x, y)
   {
-    if (x >= 0 && x < 50 && y >= 0 && y < 50)
+    if (x >= 0 && x < 111 && y >= 0 && y < 50)
     {
       sectors[this.index.x][this.index.y].currentDivision = null;
       sectors[this.index.x][this.index.y].update();
@@ -247,27 +178,105 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
 }
 
-class Aircraft // Air Units (Fighters, Bombers, CAS, Naval Bombers, Transports, etc)
-{
-  constructor(hp)
-  {
-    this.hp = hp;
-  }
-  update()
-  {
-    this.render();
-  }
-  render()
-  {
-    // Nothing here yet!
-  }
-}
-
 class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Convoys, etc)
 {
-  constructor(hp)
+  constructor(cellSize, size, index, navalcraftType)
   {
-    this.hp = hp;
+    this.cellSize = cellSize;
+    //this.position = index.multiply(cellSize);
+    this.size = size;
+    this.attack;
+    this.defense;
+    this.index = index;
+    this.navalcraftType = navalcraftType;
+
+    if (sectors[index.x][index.y].landType === "water") {
+      sectors[index.x][index.y].currentNavy = this;
+    }
+  }
+  shouldAdd()
+  {
+    return sectors[this.index.x][this.index.y].currentNavy === this;
+  }
+  update()
+  {
+    this.render();
+  }
+  action(direction)
+  {
+    if (direction === "up") {
+      this.move(0, -1);
+      this.render();
+    }
+    else if (direction === "down") {
+      this.move(0, 1);
+      this.render();
+    }
+    else if (direction === "left") {
+      this.move(-1, 0);
+      this.render();
+    }
+    else if (direction === "right") {
+      this.move(1, 0);
+      this.render();
+    }
+  }
+  render()
+  {
+    if(!sectors[this.index.x][this.index.y].navalPorts)
+    {
+      fill(255,0,255)
+      rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + plusY + 4, this.size, this.size);
+    }
+  }
+  move(x, y)
+  {
+    if (this.index.x + x >= 0 && this.index.x + x < 111 && this.index.y + y >= 0 && this.index.y + y < 50 )
+    {
+      sectors[this.index.x][this.index.y].currentNavy = null;
+      sectors[this.index.x][this.index.y].update();
+      this.index.x += x;
+      this.index.y += y;
+      sectors[this.index.x][this.index.y].currentNavy = this;
+      sectors[this.index.x][this.index.y].update();
+    }
+  }
+  moveTo(x, y)
+  {
+    if (x >= 0 && x < 111 && y >= 0 && y < 50)
+    {
+      sectors[this.index.x][this.index.y].currentNavy = null;
+      sectors[this.index.x][this.index.y].update();
+      this.index.x = x;
+      this.index.y = y;
+      sectors[this.index.x][this.index.y].currentNavy = this;
+      sectors[this.index.x][this.index.y].update();
+    }
+  }
+}
+
+class Building
+{
+  constructor(cellSize, size, index, buildingType, devastation, ammount, color)
+  {
+    this.cellSize = cellSize;
+    this.size = size;
+    this.index = index;
+    this.buildingType = buildingType;
+    this.devastation = devastation;
+    this.ammount = ammount;
+    this.color = color;
+
+    if (this.buildingType === 'navalPort') {
+      if (sectors[index.x][index.y].landType === "beach") {
+        sectors[index.x][index.y].navalPorts = this;
+      }
+    }
+    if (this.buildingType === 'landFort') {
+      if (sectors[index.x][index.y].landType !== "beach" && sectors[index.x][index.y].landType !== "water") {
+        sectors[index.x][index.y].landForts = this;
+      }
+    }
   }
   update()
   {
@@ -275,29 +284,57 @@ class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Conv
   }
   render()
   {
-    // Nothing here yet!
+    if(this.buildingType === 'navalPort') {
+      if (sectors[this.index.x][this.index.y].currentNavy === null)
+      {
+        fill(0, 0, 255);
+        ellipseMode(CORNER);
+        ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+      }
+      else
+      {
+        fill(255,0,255);
+        ellipseMode(CORNER);
+        ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+      }
+    }
+    else if(this.buildingType === 'landFort') {
+      if (sectors[this.index.x][this.index.y].currentDivision === null)
+      {
+        fill(255);
+        ellipseMode(CORNER);
+        ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+      }
+      else
+      {
+        fill(0, 255, 0);
+        ellipseMode(CORNER);
+        ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+      } 
+    }
   }
 }
-
 let sectors;
-let plusX;
 let cellSize;
 let currentSector;
+let currentSectorHovered;
 let currentUnitSelected;
 let divisions = [];
+let navies = [];
+let buildings = [];
+let settlements = [];
+
+const randBuilding = ['navalPort', 'landFort'];
 
 let gameStarted;
 let menuScreen = "main";
 let generationType = "";
 
+let plusX;
+let plusY;
+
 // Menu and War Songs
 let warSong1, menuSong;
-
-// Entente Songs
-
-// Third Internationale Songs
-
-// Reichpakt Songs
 
 // Symbols
 let nationalFocus;
@@ -329,7 +366,6 @@ function setup() {
   startGame();
 }
 
-
 function draw() {
   drawGUI();
 }
@@ -342,50 +378,34 @@ function windowResized() {
 
 // Draws the GUI
 function drawGUI() {
-  // Left side of the GUI
-  fill(0, 200, 200);
-  noStroke();
-  rect(0, 0, plusX - 1, windowHeight)
-  stroke(1);
-  fill(0);
-  textSize(20);
-  textAlign(LEFT);
-  fill(105,105,105);
-  rect(width - 355, 25, 325, 75);
-  imageMode(LEFT);
-  image(nationalFocus, width - 350, 35, 50, 50)
-  fill(255);
-  text("NO NATIONAL", width - 280, 60);
-  text("FOCUS SELECTED", width - 280, 80);
+
 }
 
 // Loads the Sectors on the Screen
 function loadSectors() {
-  for (let x = 0; x < 50; x++) {
+  for (let x = 0; x < 111; x++) {
     for (let y = 0; y < 50; y++) {
       sectors[x][y].update();
     }
   }
 }
 
-
 // Generates the World
 function generateWorld() {
   // let xoffset = random(-1000, 1000);
   // let yoffset = random(-1000, 1000);
-  let xoffset = -457.95569479042;
-  let yoffset = 146.06481880215802;
-  // noiseSeed(1); // Knock off Europe
-  noiseSeed(29);
+  let xoffset = -104659;
+  let yoffset = 104659;
   console.log(xoffset, yoffset);
   if (width >= height) {
-    cellSize = height/50;
+    cellSize = height/55;
   }
   else if (height > width) {
-    cellSize = width/50;
+    cellSize = width/100;
   }
-  plusX = cellSize * 25;
-  for (let x = 0; x < 50; x++) {
+  plusY = cellSize * 4.8;
+  plusX = cellSize / 4;
+  for (let x = 0; x < 111; x++) {
     for (let y = 0; y < 50; y++) {
       let sectorVal = noise(x / 7 + xoffset, y / 7 + yoffset);
       let sectorType;
@@ -395,7 +415,7 @@ function generateWorld() {
       }
       else if (sectorVal < 0.4)
       {
-        sectorType = 'arid';
+        sectorType = 'beach';
       }
       else if (sectorVal < 0.55)
       {
@@ -408,15 +428,27 @@ function generateWorld() {
       sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, sectorType, random());
     }
   }
-
   for (let i = 0; i < 100; i++)
   {
-    divisions.push(new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 50)), floor(random(0, 50)))));
+    let div = new Division(cellSize, cellSize / 2, 1000, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "infantry")
+    if (div.shouldAdd())
+    {
+      divisions.push(div);
+    }
+    let navy = new Navalcraft(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "destroyer");
+    if (navy.shouldAdd())
+    {
+      navies.push(navy);
+    }
+  }
+  for (let i = 0; i < 1000; i++)
+  {
+    buildings.push(new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), randBuilding[floor(random(0, randBuilding.length))], 0, 1, (0, 0, 0)));
   }
 }
 
 function startGame () {
-  sectors = getTwoDArray(50, 50);
+  sectors = getTwoDArray(111, 50);
   generateWorld();
 
   background(0, 200, 200);
@@ -425,36 +457,41 @@ function startGame () {
   gameStarted = true;
 }
 
+function nextTurn() {
+
+}
+
 function mousePressed() {
   if (gameStarted) {
     let x = floor((mouseX - plusX) / cellSize);
-    let y = floor(mouseY / cellSize);
+    let y = floor((mouseY - plusY) / cellSize);
     print("x: " + x + " y: " + y);
 
     if (currentUnitSelected != null) {
-      currentUnitSelected.moveTo(x, y);
+      if (sectors[x][y].currentDivision === null && sectors[x][y].currentNavy === null)
+      {
+        if (currentUnitSelected.divisionType !== undefined && sectors[x][y].landType !== 'water' || sectors[x][y].navalPorts != null) {
+          print(currentUnitSelected.divisionType + " moved");
+          currentUnitSelected.moveTo(x, y);
+        }
+        else if(currentUnitSelected.navalcraftType !== undefined && sectors[x][y].landType === 'water') {
+          print(currentUnitSelected.navalcraftType + " moved");
+          currentUnitSelected.moveTo(x, y);
+        }
+      }
       currentUnitSelected = null;
     }
-    else if (x >= 0 && y >= 0 && x < 50 && y <50) {
+    else if (x >= 0 && y >= 0 && x < 111 && y <50) {
       currentSector = sectors[x][y];
-      currentUnitSelected = sectors[x][y].currentDivision;
-      if (sectors[x][y].landType === "plains") {
-        print("This is a plains sector");
+      if (sectors[x][y].currentDivision) {
+        currentUnitSelected = sectors[x][y].currentDivision;
+        print(currentUnitSelected.divisionType + " selected");
       }
-      else if (sectors[x][y].landType === "forest") {
-        print("This is a forest sector");
-      }
-      else if (sectors[x][y].landType === "arid") {
-        print("This is a beach sector");
-      }
-      else if (sectors[x][y].landType === "jungle") {
-        print("This is a jungle sector");
-      }
-      else {
-        print("this is not land");
+      else if (sectors[x][y].currentNavy) {
+        currentUnitSelected = sectors[x][y].currentNavy;
+        print(currentUnitSelected.navalcraftType + " selected");
       }
     }
-    print(currentUnitSelected);
   }
 }
 
