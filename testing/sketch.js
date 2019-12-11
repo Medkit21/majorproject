@@ -284,6 +284,10 @@ class Building
       
     }
   }
+  shouldAdd()
+  {
+    return sectors[this.index.x][this.index.y].settlement === this;
+  }
   update()
   {
     this.render();
@@ -329,6 +333,7 @@ let divisions = [];
 let navies = [];
 let buildings = [];
 let settlements = [];
+let settlementCount = 0;
 
 const randBuilding = ['navalPort', 'landFort'];
 
@@ -446,6 +451,14 @@ function generateWorld() {
   for (let i = 0; i < 1000; i++)
   {
     buildings.push(new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), randBuilding[floor(random(0, randBuilding.length))], 0, 1, (0, 0, 0)));
+  }
+  while(settlementCount > 8)
+  {
+    let settlement = new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), randBuilding[floor(random(0, randBuilding.length))], 0, 1, (0, 0, 0));
+    if (settlement.shouldAdd())
+    {
+      buildings.push(settlement);
+    }
   }
 }
 
