@@ -49,7 +49,7 @@ class Sector // Template for a Sector
     this.buildLimit;
     this.currentDivision = null;
     this.currentNavy = null;
-    this.settlement = null;
+    this.currentSettlement = null;
 
     // Buildables
     this.landForts = null;
@@ -76,6 +76,10 @@ class Sector // Template for a Sector
     if (this.currentNavy != null)
     {
       this.currentNavy.update();
+    }
+    if (this.currentSettlement != null)
+    {
+      this.currentSettlement.update();
     }
   }
   render()
@@ -279,14 +283,14 @@ class Building
     }
     if (this.buildingType === 'settlement') {
       if (sectors[index.x][index.y].landType !== "beach" && sectors[index.x][index.y].landType !== "water") {
-        sectors[index.x][index.y].settlement = this;
+        sectors[index.x][index.y].currentSettlement = this;
       }
       
     }
   }
   shouldAdd()
   {
-    return sectors[this.index.x][this.index.y].settlement === this;
+    return sectors[this.index.x][this.index.y].currentSettlement === this;
   }
   update()
   {
@@ -321,6 +325,11 @@ class Building
         ellipseMode(CORNER);
         ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
       } 
+    }
+    else if (this.buildingType === 'settlement') {
+      fill(0);
+      ellipseMode(CORNER);
+      ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
     }
   }
 }
@@ -452,12 +461,13 @@ function generateWorld() {
   {
     buildings.push(new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), randBuilding[floor(random(0, randBuilding.length))], 0, 1, (0, 0, 0)));
   }
-  while(settlementCount > 8)
+  while(settlementCount < 8)
   {
-    let settlement = new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), randBuilding[floor(random(0, randBuilding.length))], 0, 1, (0, 0, 0));
+    let settlement = new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), 'settlement', 0, 1, (0, 0, 0));
     if (settlement.shouldAdd())
     {
       buildings.push(settlement);
+      settlementCount++;
     }
   }
 }
