@@ -261,7 +261,7 @@ class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Conv
 
 class Building
 {
-  constructor(cellSize, size, index, buildingType, devastation, ammount, color)
+  constructor(cellSize, size, index, buildingType, devastation, ammount, team)
   {
     this.cellSize = cellSize;
     this.size = size;
@@ -269,7 +269,7 @@ class Building
     this.buildingType = buildingType;
     this.devastation = devastation;
     this.ammount = ammount;
-    this.color = color;
+    this.team = team;
 
     if (this.buildingType === 'navalPort') {
       if (sectors[index.x][index.y].landType === "beach") {
@@ -327,7 +327,7 @@ class Building
       } 
     }
     else if (this.buildingType === 'settlement') {
-      fill(0);
+      fill(this.team);
       ellipseMode(CORNER);
       ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
     }
