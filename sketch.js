@@ -46,10 +46,10 @@ class Sector // Template for a Sector
     this.size = size;
     this.infrastructure;
     this.defense;
-    this.LocManpower; // Local Manpower
     this.buildLimit;
     this.currentDivision = null;
     this.currentNavy = null;
+    this.currentSettlement = null;
 
     // Buildables
     this.landForts = null;
@@ -61,10 +61,6 @@ class Sector // Template for a Sector
   {
 
     this.render();
-    if (this.navalPorts != null)
-    {
-      this.navalPorts.update();
-    }
     if (this.landForts != null)
     {
       this.landForts.update();
@@ -73,9 +69,9 @@ class Sector // Template for a Sector
     {
       this.currentDivision.update();
     }
-    if (this.currentNavy != null)
+    if (this.currentSettlement != null)
     {
-      this.currentNavy.update();
+      this.currentSettlement.update();
     }
   }
   render()
@@ -178,86 +174,9 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
 }
 
-class Navalcraft // Naval Units (U-Boats, Submarines, Destroyers, Cruisers, Convoys, etc)
-{
-  constructor(cellSize, size, index, navalcraftType)
-  {
-    this.cellSize = cellSize;
-    //this.position = index.multiply(cellSize);
-    this.size = size;
-    this.attack;
-    this.defense;
-    this.index = index;
-    this.navalcraftType = navalcraftType;
-
-    if (sectors[index.x][index.y].landType === "water") {
-      sectors[index.x][index.y].currentNavy = this;
-    }
-  }
-  shouldAdd()
-  {
-    return sectors[this.index.x][this.index.y].currentNavy === this;
-  }
-  update()
-  {
-    this.render();
-  }
-  action(direction)
-  {
-    if (direction === "up") {
-      this.move(0, -1);
-      this.render();
-    }
-    else if (direction === "down") {
-      this.move(0, 1);
-      this.render();
-    }
-    else if (direction === "left") {
-      this.move(-1, 0);
-      this.render();
-    }
-    else if (direction === "right") {
-      this.move(1, 0);
-      this.render();
-    }
-  }
-  render()
-  {
-    if(!sectors[this.index.x][this.index.y].navalPorts)
-    {
-      fill(255,0,255)
-      rect(this.index.x * this.cellSize + plusX + 4, this.index.y * this.cellSize + plusY + 4, this.size, this.size);
-    }
-  }
-  move(x, y)
-  {
-    if (this.index.x + x >= 0 && this.index.x + x < 111 && this.index.y + y >= 0 && this.index.y + y < 50 )
-    {
-      sectors[this.index.x][this.index.y].currentNavy = null;
-      sectors[this.index.x][this.index.y].update();
-      this.index.x += x;
-      this.index.y += y;
-      sectors[this.index.x][this.index.y].currentNavy = this;
-      sectors[this.index.x][this.index.y].update();
-    }
-  }
-  moveTo(x, y)
-  {
-    if (x >= 0 && x < 111 && y >= 0 && y < 50)
-    {
-      sectors[this.index.x][this.index.y].currentNavy = null;
-      sectors[this.index.x][this.index.y].update();
-      this.index.x = x;
-      this.index.y = y;
-      sectors[this.index.x][this.index.y].currentNavy = this;
-      sectors[this.index.x][this.index.y].update();
-    }
-  }
-}
-
 class Building
 {
-  constructor(cellSize, size, index, buildingType, devastation, ammount, color)
+  constructor(cellSize, size, index, buildingType, devastation, ammount, team)
   {
     this.cellSize = cellSize;
     this.size = size;
@@ -265,7 +184,7 @@ class Building
     this.buildingType = buildingType;
     this.devastation = devastation;
     this.ammount = ammount;
-    this.color = color;
+    this.team = team;
 
     if (this.buildingType === 'navalPort') {
       if (sectors[index.x][index.y].landType === "beach") {
@@ -277,6 +196,16 @@ class Building
         sectors[index.x][index.y].landForts = this;
       }
     }
+    if (this.buildingType === 'settlement') {
+      if (sectors[index.x][index.y].landType !== "beach" && sectors[index.x][index.y].landType !== "water") {
+        sectors[index.x][index.y].currentSettlement = this;
+      }
+      
+    }
+  }
+  shouldAdd()
+  {
+    return sectors[this.index.x][this.index.y].currentSettlement === this;
   }
   update()
   {
@@ -312,6 +241,11 @@ class Building
         ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
       } 
     }
+    else if (this.buildingType === 'settlement') {
+      fill(this.team);
+      ellipseMode(CORNER);
+      ellipse(this.index.x * this.cellSize + (plusX * 2), this.index.y * this.cellSize + plusY + 4.5, this.size, this.size);
+    }
   }
 }
 let sectors;
@@ -320,9 +254,9 @@ let currentSector;
 let currentSectorHovered;
 let currentUnitSelected;
 let divisions = [];
-let navies = [];
 let buildings = [];
 let settlements = [];
+let settlementCount = 0;
 
 const randBuilding = ['navalPort', 'landFort'];
 
@@ -341,10 +275,6 @@ let nationalFocus;
 
 function preload() {
   nationalFocus = loadImage("assets/nationalFocus.png");
-  
-  //Preloading Music (Menu and War)
-  menuSong = loadSound("assets/sound/music/menusong.ogg") // Main Menu Song
-  warSong1 = loadSound('assets/sound/music/war/war1.ogg'); // 1812 Overture Finale
 }
 
 function getTwoDArray(x, y)
@@ -435,15 +365,19 @@ function generateWorld() {
     {
       divisions.push(div);
     }
-    let navy = new Navalcraft(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), "destroyer");
-    if (navy.shouldAdd())
-    {
-      navies.push(navy);
-    }
   }
   for (let i = 0; i < 1000; i++)
   {
     buildings.push(new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), randBuilding[floor(random(0, randBuilding.length))], 0, 1, (0, 0, 0)));
+  }
+  while(settlementCount < 8)
+  {
+    let settlement = new Building(cellSize, cellSize / 2, new Vector2(floor(random(0, 111)), floor(random(0, 50))), 'settlement', 0, 1, (0, 0, 0));
+    if (settlement.shouldAdd())
+    {
+      buildings.push(settlement);
+      settlementCount++;
+    }
   }
 }
 
@@ -487,14 +421,6 @@ function mousePressed() {
         currentUnitSelected = sectors[x][y].currentDivision;
         print(currentUnitSelected.divisionType + " selected");
       }
-      else if (sectors[x][y].currentNavy) {
-        currentUnitSelected = sectors[x][y].currentNavy;
-        print(currentUnitSelected.navalcraftType + " selected");
-      }
     }
   }
-}
-
-function keyPressed() {
-
 }
