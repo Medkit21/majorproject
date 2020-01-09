@@ -248,6 +248,22 @@ class Building
     }
   }
 }
+
+class Faction
+{
+  constructor(nation, number, side, isPlayer, isNeutral)
+  {
+    this.nation = nation;
+    this.number = number;
+    this.side = side;
+
+    this.isPlayer = isPlayer;
+    this.isNeutral = isNeutral;
+
+
+  }
+}
+
 let sectors;
 let cellSize;
 let currentSector;
@@ -257,6 +273,9 @@ let divisions = [];
 let buildings = [];
 let settlements = [];
 let settlementCount = 0;
+let playerFaction = [];
+let enemyFaction = [];
+let neutralFaction = [];
 
 const randBuilding = ['navalPort', 'landFort'];
 
@@ -270,11 +289,24 @@ let plusY;
 // Menu and War Songs
 let warSong1, menuSong;
 
-// Symbols
-let nationalFocus;
+// Flags
+let flagSoviet, flagUK, flagUSA;
+let flagReich, flagItaly, flagJapan;
+let flagPoland, flagFrance, flagChina;
 
 function preload() {
-  nationalFocus = loadImage("assets/nationalFocus.png");
+  // Allied Flags
+  flagSoviet = loadImage("assets/icons/flags/allied/flagSoviet.png");
+  flagUK = loadImage("assets/icons/flags/allied/flagUK.png");
+  flagUSA = loadImage("assets/icons/flags/allied/flagUSA.png");
+  // Axis Flags
+  flagReich = loadImage("assets/icons/flags/axis/flagReich.png");
+  flagItaly = loadImage("assets/icons/flags/axis/flagItaly.png");
+  flagJapan = loadImage("assets/icons/flags/axis/flagJapan.png");
+  // Neutral Flags
+  flagPoland = loadImage("assets/icons/flags/neutral/flagPoland.png");
+  flagFrance = loadImage("assets/icons/flags/neutral/flagFrance.png");
+  flagChina = loadImage("assets/icons/flags/neutral/flagChina.png");
 }
 
 function getTwoDArray(x, y)
