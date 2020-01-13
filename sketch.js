@@ -8,7 +8,6 @@
 // Vector2 Implementation
 // Perlin Noise
 
-
 class Vector2
 {
   constructor(x, y)
@@ -85,8 +84,17 @@ class Sector // Template for a Sector
     else if (this.landType === "beach") {
       fill(210, 180, 140);
     }
+    else if (this.landType === "snow") {
+      fill(230, 230, 230);
+    }
+    else if (this.landType === "concrete") {
+      fill(100, 100, 100);
+    }
     else if (this.landType === "jungle") {
       fill(0, 100, 0);
+    }
+    else if (this.landType === "ice") {
+      fill(150, 150, 255);
     }
     else {
       fill(0, 0, 255);
@@ -248,6 +256,22 @@ class Building
     }
   }
 }
+
+class Faction
+{
+  constructor(nation, number, side, isPlayer, isNeutral)
+  {
+    this.nation = nation;
+    this.number = number;
+    this.side = side;
+
+    this.isPlayer = isPlayer;
+    this.isNeutral = isNeutral;
+
+
+  }
+}
+
 let sectors;
 let cellSize;
 let currentSector;
@@ -257,11 +281,14 @@ let divisions = [];
 let buildings = [];
 let settlements = [];
 let settlementCount = 0;
+let playerFaction = [];
+let enemyFaction = [];
+let neutralFaction = [];
 
 const randBuilding = ['navalPort', 'landFort'];
 
 let gameStarted;
-let menuScreen = "main";
+let menuScreen = 1;
 let generationType = "";
 
 let plusX;
@@ -270,11 +297,24 @@ let plusY;
 // Menu and War Songs
 let warSong1, menuSong;
 
-// Symbols
-let nationalFocus;
+// Flags
+let flagSoviet, flagUK, flagUSA;
+let flagReich, flagItaly, flagJapan;
+let flagPoland, flagFrance, flagChina;
 
 function preload() {
-  nationalFocus = loadImage("assets/nationalFocus.png");
+  // Allied Flags
+  flagSoviet = loadImage("assets/icons/flags/allied/flagSoviet.png");
+  flagUK = loadImage("assets/icons/flags/allied/flagUK.png");
+  flagUSA = loadImage("assets/icons/flags/allied/flagUSA.png");
+  // Axis Flags
+  flagReich = loadImage("assets/icons/flags/axis/flagReich.png");
+  flagItaly = loadImage("assets/icons/flags/axis/flagItaly.png");
+  flagJapan = loadImage("assets/icons/flags/axis/flagJapan.png");
+  // Neutral Flags
+  flagPoland = loadImage("assets/icons/flags/neutral/flagPoland.png");
+  flagFrance = loadImage("assets/icons/flags/neutral/flagFrance.png");
+  flagChina = loadImage("assets/icons/flags/neutral/flagChina.png");
 }
 
 function getTwoDArray(x, y)
@@ -341,7 +381,7 @@ function generateWorld() {
       let sectorType;
       if (sectorVal < 0.35)
       {
-        sectorType = 'water';
+        sectorType = 'ice';
       }
       else if (sectorVal < 0.4)
       {
@@ -349,7 +389,7 @@ function generateWorld() {
       }
       else if (sectorVal < 0.55)
       {
-        sectorType = 'plains';
+        sectorType = 'snow';
       }
       else
       {
