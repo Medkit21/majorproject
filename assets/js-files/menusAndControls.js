@@ -85,9 +85,11 @@ function mousePressed() {
           if (mouseX > width/2 - 200 && mouseX < width/2 + 200 && mouseY > height/2 - 100 - 75 && mouseY < height/2 - 100 + 75) {
             mode = 'singeplayer';
             startGame();
+            document.getElementById("Json-file").style.display = 'inline';
           }
           if (mouseX > width/2 - 200 && mouseX < width/2 + 200 && mouseY > height/2 + 100 - 75 && mouseY < height/2 + 100 + 75) {
             mode = 'editor';
+            editorMode = 'terrain';
             startGame();
           }
         }
@@ -126,6 +128,22 @@ function keyPressed()
     if (key === 'b')
     {
       terrainType = 'beach';
+    }
+    if (key === 'l')
+    {
+      mapData.arr = getTwoDArray(95,50);
+      for(let i = 0; i < 95; i++)
+      {
+        for(let j = 0; j < 50; j++)
+        {
+          let obj = {
+            landtype: sectors[i][j].landType,
+          };
+          mapData.arr[i][j] = obj;
+          print(obj);
+        }
+      }
+      saveJSON(mapData, 'mapData.json');
     }
     if (key === 'm')
     {

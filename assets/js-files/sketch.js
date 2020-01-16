@@ -25,6 +25,8 @@ let editorMode;
 let playerCurrency;
 let enemyCurrency;
 const randBuilding = ['navalPort', 'landFort'];
+var mapData = {}
+const reader = new FileReader();
 
 let gameStarted;
 let guiWidth, guiHeight;
@@ -92,50 +94,86 @@ function loadSectors() {
 }
 
 // Generates the World
-function generateWorld() {
+function generateWorld(json) {
   // let xoffset = random(-1000, 1000);
   // let yoffset = random(-1000, 1000);
   let xoffset = -104659;
   let yoffset = 104659;
   console.log(xoffset, yoffset);
-  if (width >= height) {
-    cellSize = height/55;
-  }
-  else if (height > width) {
-    cellSize = width/95;
-  }
-  for (let x = 0; x < 95; x++) {
-    for (let y = 0; y < 50; y++) {
-      // let sectorVal = noise(x / 7 + xoffset, y / 7 + yoffset);
-      let sectorType;
-      // if (sectorVal < 0.35)
-      // {
-      //   sectorType = 'water';
-      // }
-      // else if (sectorVal < 0.4)
-      // {
-      //   sectorType = 'beach';
-      // }
-      // else if (sectorVal < 0.55)
-      // {
-      //   sectorType = 'plains';
-      // }
-      // else
-      // {
-      //   sectorType = 'forest';
-      // }
-      sectorType = 'snow'
-      sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, sectorType, random(), '');
+  cellSize = height/55;
+  if (json === undefined)
+  {
+    for (let x = 0; x < 95; x++) {
+      for (let y = 0; y < 50; y++) {
+        // let sectorVal = noise(x / 7 + xoffset, y / 7 + yoffset);
+        let sectorType;
+        // if (sectorVal < 0.35)
+        // {
+        //   sectorType = 'water';
+        // }
+        // else if (sectorVal < 0.4)
+        // {
+        //   sectorType = 'beach';
+        // }
+        // else if (sectorVal < 0.55)
+        // {
+        //   sectorType = 'plains';
+        // }
+        // else
+        // {
+        //   sectorType = 'forest';
+        // }
+        sectorType = 'snow'
+        sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, sectorType, random(), '');
+      }
     }
+  }
+  else
+  {
+    for (let x = 0; x < 95; x++) {
+      for (let y = 0; y < 50; y++) {
+        // let sectorVal = noise(x / 7 + xoffset, y / 7 + yoffset);
+        let sectorType;
+        // if (sectorVal < 0.35)
+        // {
+        //   sectorType = 'water';
+        // }
+        // else if (sectorVal < 0.4)
+        // {
+        //   sectorType = 'beach';
+        // }
+        // else if (sectorVal < 0.55)
+        // {
+        //   sectorType = 'plains';
+        // }
+        // else
+        // {
+        //   sectorType = 'forest';
+        // }
+        sectorType = 'snow'
+        sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, json.arr[x][y].landtype, random(), '');
+      }
+    }
+    loadSectors();
+    document.getElementById("Json-file").style.display = 'none';
   }
 }
 
 function startGame () {
   sectors = getTwoDArray(95, 50);
   generateWorld();
-
+  
   gameStarted = true;
   background(0, 200, 200);
   displayMenu()
   loadSectors();
+}
+
+function calledFromHTML() {
+  jsonF = document.getElementById("Json-file").files[0];
+  reader.readAsText(jsonF)
+  reader.onloadend = function () {
+    generateWorld(JSON.parse(reader.result));
+    //console.log(reader.result)
+  }
 }
