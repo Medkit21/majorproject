@@ -35,23 +35,17 @@ let mode = '';
 let warSong1, menuSong;
 
 // Flags
-let flagSoviet, flagUK, flagUSA;
-let flagReich, flagItaly, flagJapan;
-let flagPoland, flagFrance, flagChina;
+let flagSoviet;
+let flagReich;
+let flagPoland;
 
 function preload() {
   // Allied Flags
   flagSoviet = loadImage("assets/icons/flags/allied/flagSoviet.png");
-  flagUK = loadImage("assets/icons/flags/allied/flagUK.png");
-  flagUSA = loadImage("assets/icons/flags/allied/flagUSA.png");
   // Axis Flags
   flagReich = loadImage("assets/icons/flags/axis/flagReich.png");
-  flagItaly = loadImage("assets/icons/flags/axis/flagItaly.png");
-  flagJapan = loadImage("assets/icons/flags/axis/flagJapan.png");
   // Neutral Flags
   flagPoland = loadImage("assets/icons/flags/neutral/flagPoland.png");
-  flagFrance = loadImage("assets/icons/flags/neutral/flagFrance.png");
-  flagChina = loadImage("assets/icons/flags/neutral/flagChina.png");
 }
 
 function getTwoDArray(x, y)
@@ -66,11 +60,13 @@ function getTwoDArray(x, y)
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  background(0, 200, 200);
+  background(50, 50, 50);
 
-  editorMode = 'terrain';
-  mode = 'editor';
-  startGame();
+  displayMenu();
+
+  // editorMode = 'terrain';
+  // mode = 'editor';
+  // startGame();
 }
 
 function draw() {
@@ -78,9 +74,12 @@ function draw() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  background(0, 200, 200);
+  background(50, 50, 50);
   displayMenu();
-  loadSectors();
+  if (gameStarted)
+  {
+    loadSectors();
+  }
 }
 
 // Loads the Sectors on the Screen

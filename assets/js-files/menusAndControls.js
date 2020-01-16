@@ -1,4 +1,4 @@
-// Map Editor
+// Mouse and Keyboard Controls and Menus and the code for the map editor
 
 function displayMenu()
 {
@@ -12,6 +12,28 @@ function displayMenu()
     rect((cellSize*95), 0, guiWidth, height);
     rect(0, (cellSize*50), width, guiHeight);
     stroke(1);
+  }
+  else {
+    if (scene === 1)
+    {
+      rectMode(CENTER);
+      fill(100, 100, 100);
+      rect(windowWidth/2, windowHeight/2 - 100, 400, 150);
+      textAlign(CENTER);
+      textSize(50);
+      fill(0);
+      text("Singleplayer", windowWidth/2, windowHeight/2 - 90)
+      rectMode(CORNER);
+
+      rectMode(CENTER);
+      fill(100, 100, 100);
+      rect(windowWidth/2, windowHeight/2 + 200 - 100, 400, 150);
+      textAlign(CENTER);
+      textSize(50);
+      fill(0);
+      text("Map Editor", windowWidth/2, windowHeight/2 + 120)
+      rectMode(CORNER);
+    }
   }
 }
 
@@ -52,6 +74,22 @@ function mousePressed() {
         {
           sectors[x][y].landType = terrainType;
           loadSectors();
+        }
+      }
+    }
+    else
+    {
+      if (scene === 1)
+      {
+        if (mouseIsPressed) {
+          if (mouseX > width/2 - 200 && mouseX < width/2 + 200 && mouseY > height/2 - 100 - 75 && mouseY < height/2 - 100 + 75) {
+            mode = 'singeplayer';
+            startGame();
+          }
+          if (mouseX > width/2 - 200 && mouseX < width/2 + 200 && mouseY > height/2 + 100 - 75 && mouseY < height/2 + 100 + 75) {
+            mode = 'editor';
+            startGame();
+          }
         }
       }
     }
