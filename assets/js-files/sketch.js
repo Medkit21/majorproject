@@ -22,7 +22,8 @@ let enemyFaction = [];
 let neutralFaction = [];
 let terrainType = '';
 let editorMode;
-
+let playerCurrency;
+let enemyCurrency;
 const randBuilding = ['navalPort', 'landFort'];
 
 let gameStarted;
@@ -125,7 +126,7 @@ function generateWorld() {
       //   sectorType = 'forest';
       // }
       sectorType = 'snow'
-      sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, sectorType, random());
+      sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, sectorType, random(), '');
     }
   }
 }
