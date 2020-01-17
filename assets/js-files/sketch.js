@@ -99,7 +99,6 @@ function generateWorld(json) {
   // let yoffset = random(-1000, 1000);
   let xoffset = -104659;
   let yoffset = 104659;
-  console.log(xoffset, yoffset);
   cellSize = height/55;
   if (json === undefined)
   {
