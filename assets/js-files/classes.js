@@ -168,7 +168,7 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
 }
 
-class Building
+class Building // Buildings creatable by players and AI
 {
   constructor(cellSize, size, index, buildingType, damage, side)
   {
