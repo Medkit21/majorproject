@@ -91,6 +91,7 @@ function mousePressed() {
             mode = 'editor';
             editorMode = 'terrain';
             startGame();
+            document.getElementById("Json-file").style.display = 'inline';
           }
         }
       }

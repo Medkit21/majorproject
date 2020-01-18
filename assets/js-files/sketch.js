@@ -33,23 +33,6 @@ let guiWidth, guiHeight;
 let scene = 1;
 let mode = '';
 
-// Menu and War Songs
-let warSong1, menuSong;
-
-// Flags
-let flagSoviet;
-let flagReich;
-let flagPoland;
-
-function preload() {
-  // Allied Flags
-  flagSoviet = loadImage("assets/icons/flags/allied/flagSoviet.png");
-  // Axis Flags
-  flagReich = loadImage("assets/icons/flags/axis/flagReich.png");
-  // Neutral Flags
-  flagPoland = loadImage("assets/icons/flags/neutral/flagPoland.png");
-}
-
 function getTwoDArray(x, y)
 {
   let arr = new Array(x);
@@ -154,7 +137,10 @@ function generateWorld(json) {
       }
     }
     loadSectors();
-    document.getElementById("Json-file").style.display = 'none';
+    if (mode !== 'editor')
+    {
+      document.getElementById("Json-file").style.display = 'none';
+    }
   }
 }
 
