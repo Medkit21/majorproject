@@ -101,7 +101,7 @@ class Sector // Template for a Sector
 
 class Division // Land Units (Infantry, Cavalry, Tanks, etc)
 {
-  constructor(cellSize, size, mp, index, divisionType)
+  constructor(cellSize, size, mp, index, divisionType, side)
   {
     this.cellSize = cellSize;
     //this.position = index.multiply(cellSize);
@@ -112,6 +112,9 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
     this.defense;
     this.index = index;
     this.divisionType = divisionType;
+    this.side = side;
+
+    this.moveCounter = 0;
 
     this.goalX = this.index.x;
     this.goalY = this.index.y;
@@ -149,9 +152,24 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
   render()
   {
-    if(!sectors[this.index.x][this.index.y].landForts)
+    if (this.side === 'soviet')
     {
-      image(sovHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      if (this.divisionType === "infantry")
+      {
+        image(sovHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      }
+      else if (this.divisionType === "tank")
+      {
+        image(sovArmW, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      }
+    }
+    else if (this.side === 'german')
+    {
+      image(gerHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+    }
+    else
+    {
+      image(polHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
     }
   }
   move(x, y)
@@ -180,7 +198,19 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   }
   advance()
   {
-    this.move(Math.sign(this.goalX - this.index.x), Math.sign(this.goalY - this.index.y));
+    if (sectors[this.index.x][this.index.y].landType === 'water' || sectors[this.index.x][this.index.y].landType === 'ice' || this.divisionType === "tank")
+    {
+      this.moveCounter = this.moveCounter + 1;
+      if(this.moveCounter == 2)
+      {
+        this.move(Math.sign(this.goalX - this.index.x), Math.sign(this.goalY - this.index.y));
+        this.moveCounter = 0;
+      }
+    }
+    else
+    {
+      this.move(Math.sign(this.goalX - this.index.x), Math.sign(this.goalY - this.index.y));
+    }
   }
   moveTo(x,y)
   {

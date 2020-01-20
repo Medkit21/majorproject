@@ -55,7 +55,7 @@ function setup() {
 }
 
 function draw() {
-  if (millis() > lastAdvance+1000)
+  if (millis() > lastAdvance+500)
   {
     lastAdvance = millis();
     print("something");
