@@ -124,25 +124,6 @@ function generateWorld(json) {
   {
     for (let x = 0; x < 95; x++) {
       for (let y = 0; y < 50; y++) {
-        // let sectorVal = noise(x / 7 + xoffset, y / 7 + yoffset);
-        let sectorType;
-        // if (sectorVal < 0.35)
-        // {
-        //   sectorType = 'water';
-        // }
-        // else if (sectorVal < 0.4)
-        // {
-        //   sectorType = 'beach';
-        // }
-        // else if (sectorVal < 0.55)
-        // {
-        //   sectorType = 'plains';
-        // }
-        // else
-        // {
-        //   sectorType = 'forest';
-        // }
-        sectorType = 'snow'
         sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, json.arr[x][y].landtype, '');
         if (json.arr[x][y].landtype === 'forest')
         {

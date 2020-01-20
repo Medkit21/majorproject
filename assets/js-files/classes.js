@@ -60,13 +60,13 @@ class Sector // Template for a Sector
     {
       this.landForts.update();
     }
-    if (this.currentDivision != null)
-    {
-      this.currentDivision.update();
-    }
     if (this.currentEnvObject != null)
     {
       this.currentEnvObject.update();
+    }
+    if (this.currentDivision != null)
+    {
+      this.currentDivision.update();
     }
   }
   render()
