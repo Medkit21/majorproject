@@ -15,11 +15,9 @@ let currentSectorHovered;
 let currentUnitSelected;
 let divisions = [];
 let buildings = [];
+let envObjects = [];
 let settlements = [];
 let settlementCount = 0;
-let playerFaction = [];
-let enemyFaction = [];
-let neutralFaction = [];
 let terrainType = '';
 let editorMode;
 let playerCurrency;
@@ -27,6 +25,7 @@ let enemyCurrency;
 const randBuilding = ['navalPort', 'landFort'];
 var mapData = {}
 const reader = new FileReader();
+let lastAdvance;
 
 let gameStarted;
 let guiWidth, guiHeight;
@@ -48,6 +47,7 @@ function setup() {
   background(50, 50, 50);
 
   displayMenu();
+  lastAdvance = millis();
 
   // editorMode = 'terrain';
   // mode = 'editor';
@@ -55,6 +55,15 @@ function setup() {
 }
 
 function draw() {
+  if (millis() > lastAdvance+1000)
+  {
+    lastAdvance = millis();
+    print("something");
+    for (let i = 0; i < divisions.length; i++)
+    {
+      divisions[i].advance();
+    }
+  }
 }
 
 function windowResized() {
@@ -106,7 +115,8 @@ function generateWorld(json) {
         //   sectorType = 'forest';
         // }
         sectorType = 'snow'
-        sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, sectorType, random(), '');
+        sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, sectorType, '');
+        // envObjects.push(new EnvObject(cellSize, cellSize, new Vector2(x,y), 'tree'));
       }
     }
   }
@@ -133,7 +143,11 @@ function generateWorld(json) {
         //   sectorType = 'forest';
         // }
         sectorType = 'snow'
-        sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, json.arr[x][y].landtype, random(), '');
+        sectors[x][y] = new Sector(new Vector2(x * cellSize, y * cellSize), cellSize, json.arr[x][y].landtype, '');
+        if (json.arr[x][y].landtype === 'forest')
+        {
+          envObjects.push(new EnvObject(cellSize, cellSize, new Vector2(x,y), 'tree'));
+        }
       }
     }
     loadSectors();

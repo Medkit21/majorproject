@@ -39,16 +39,22 @@ class Sector // Template for a Sector
     this.defense;
     this.buildLimit;
     this.envObject = envObject;
+    this.currentEnvObject = null;
     this.currentDivision = null;
 
+    // if (this.landType === 'forest')
+    // {
+    //   envObjects.push(new EnvObject(cellSize, cellSize, (this.x, this.y), 'tree'));
+    // }
+
+    
     // Buildables
     this.landForts = null;
-
+    
     this.landType = landType;
   }
   update()
   {
-
     this.render();
     if (this.landForts != null)
     {
@@ -57,6 +63,10 @@ class Sector // Template for a Sector
     if (this.currentDivision != null)
     {
       this.currentDivision.update();
+    }
+    if (this.currentEnvObject != null)
+    {
+      this.currentEnvObject.update();
     }
   }
   render()
@@ -103,6 +113,9 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
     this.index = index;
     this.divisionType = divisionType;
 
+    this.goalX = this.index.x;
+    this.goalY = this.index.y;
+
     if (sectors[index.x][index.y].landType !== "water") {
       sectors[index.x][index.y].currentDivision = this;
     }
@@ -138,8 +151,7 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   {
     if(!sectors[this.index.x][this.index.y].landForts)
     {
-      fill(0, 255, 0)
-      rect(this.index.x * this.cellSize + 4, this.index.y * this.cellSize + 4, this.size, this.size);
+      image(sovHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
     }
   }
   move(x, y)
@@ -154,9 +166,9 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
       sectors[this.index.x][this.index.y].update();
     }
   }
-  moveTo(x, y)
+  teleportTo(x, y)
   {
-    if (x >= 0 && x < 111 && y >= 0 && y < 50)
+    if (x >= 0 && x < 95 && y >= 0 && y < 50)
     {
       sectors[this.index.x][this.index.y].currentDivision = null;
       sectors[this.index.x][this.index.y].update();
@@ -165,6 +177,15 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
       sectors[this.index.x][this.index.y].currentDivision = this;
       sectors[this.index.x][this.index.y].update();
     }
+  }
+  advance()
+  {
+    this.move(Math.sign(this.goalX - this.index.x), Math.sign(this.goalY - this.index.y));
+  }
+  moveTo(x,y)
+  {
+    this.goalX = x;
+    this.goalY = y;
   }
 }
 
@@ -210,43 +231,53 @@ class Building // Buildings creatable by players and AI
 
 class EnvObject // Environment objects (Such as houses, factories, bridges, supply depots, boulders, trees, wrecks, etc.)
 {
-    constructor(cellSize, size, index, objectType)
-    {
-        this.cellSize = cellSize;
-        this.size = size;
-        this.index = index;
-        this.objectType = objectType;
+  constructor(cellSize, size, index, objectType)
+  {
+    this.cellSize = cellSize;
+    this.size = size;
+    this.index = index;
+    this.objectType = objectType;
+  
+    // Object Booleans
+    this.isBreakble; // determines if the object can be destroyed by units
+    this.isCapturable; // determines whether units can capture the building or not (eg. factories or bridges)
+    this.isGarrisonable; // determines if Units can garrison the object (eg. houses and buildings)
+    this.isResource; // whether it is a source of income or not (eg. supply depots or vehicle wrecks)
+    this.canConvert; // whether or not the object can be converted to something else (eg. tree -> sawmill or  boulders -> quarry)
+    this.requireSupplyTruck; // whether or not the object requires a supply truck to acquire resources
+  
+    this.hp;
+    this.resourceAmount;
+    this.output;
+    this.side;
 
-        // Object Booleans
-        this.isBreakble; // determines if the object can be destroyed by units
-        this.isCapturable; // determines whether units can capture the building or not (eg. factories or bridges)
-        this.isGarrisonable; // determines if Units can garrison the object (eg. houses and buildings)
-        this.isResource; // whether it is a source of income or not (eg. supply depots or vehicle wrecks)
-        this.canConvert; // whether or not the object can be converted to something else (eg. tree -> sawmill or  boulders -> quarry)
-        this.requireSupplyTruck; // whether or not the object requires a supply truck to acquire resources
-
-        this.hp;
-        this.resourceAmount;
-        this.output;
-        this.side;
-
-
-        if (this.objectType === 'tree')
-        {
-            this.isBreakble = true;
-            this.isResource = true;
-            this.canConvert = true;
-            this.hp = 50;
-            this.resourceAmount = floor(random(15, 21));
-
-
-        }
+    sectors[this.index.x][this.index.y].currentEnvObject = this;
+      
+    if (this.objectType === 'tree')
+    {          
+      this.isBreakble = true;
+        this.isResource = true;
+        this.canConvert = true;
+        this.hp = 50;
+        this.resourceAmount = floor(random(15, 21));
     }
-    convert()
+  }
+  convert()
+  {
+      if (this.objectType === 'tree')
+      {
+          
+      }
+  }
+  update()
+  {
+    this.render();
+  }
+  render()
+  {
+    if (this.objectType === 'tree')
     {
-        if (objectType === 'tree')
-        {
-            
-        }
+      image(treeW, this.index.x * this.cellSize, this.index.y * this.cellSize, cellSize, cellSize);
     }
+  }
 }

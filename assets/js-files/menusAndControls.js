@@ -46,15 +46,15 @@ function mousePressed() {
         let y = floor((mouseY) / cellSize);
         print("x: " + x + " y: " + y);
     
-        if (currentUnitSelected != null) {
-          if (sectors[x][y].currentDivision === null && sectors[x][y].currentNavy === null)
+        if (currentUnitSelected !== undefined) {
+          if (sectors[x][y].currentDivision === null)
           {
-            if (currentUnitSelected.divisionType !== undefined && sectors[x][y].landType !== 'water' || sectors[x][y].navalPorts != null) {
+            if (currentUnitSelected.divisionType !== undefined && sectors[x][y].landType !== 'water') {
               print(currentUnitSelected.divisionType + " moved");
               currentUnitSelected.moveTo(x, y);
             }
           }
-          currentUnitSelected = null;
+          currentUnitSelected = undefined;
         }
         else if (x >= 0 && y >= 0 && x < 95 && y <50) {
           currentSector = sectors[x][y];

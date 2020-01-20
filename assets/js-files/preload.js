@@ -5,6 +5,9 @@ let warSong1, warSong2, warSong3, warFinale, menuSong;
 let gerSelect, gerAction, gerRetreat; // German Voices
 let sovSelect, sovAction, sovRetreat; // Soviet/Russian Voices
 
+// Battle Sounds
+let ambienceAA, ambienceAT, ambienceRocket, ambienceFighter, ambienceGen, ambienceMG, ambienceMort, ambienceTank;
+
 // Flags
 let flagSoviet, flagUSA; // Allied Flags
 let flagReich; // Axis Flags
@@ -12,9 +15,12 @@ let flagPoland, flagFrance; // Neutral Flags
 
 // Unit Icons
 let sovHelmet, gerHelmet, polHelmet, usaHelmet, ukHelmet, ukHelmetD;
-let sovArmW, gerArmW, genArmW;
 let sovTruck, gerTruck, genTruck, polTruck;
 let sovEngi, gerEngi, genEngi, polEngiT;
+let sovMortI, gerMortI, genMortI;
+let sovATI, gerATI, genATI;
+let sovAPCI, gerAPCI, genAPCI;
+let sovArmW, gerArmW, genArmW;
 
 // Unit Portraits
 let sovRifleW, sovSmgW, sovATW, sovMgW, sovSniperW, sovNKVDW, sovPartisanW, sovSupplyW, sovEngiW, sovMortW, sovATArtW, sovAPCW, sovTankW, sovFighterW, sovBomberW; // Soviet Winter
@@ -23,6 +29,9 @@ let gerRifleW, gerSmgW, gerATW, gerMgW, gerSniperW, gerOfficerW, gerMedicW, gerS
 let polRifleW, polOfficerW, polSupplyW, polEngiW; // Polish Winter
 let polRifle, polOfficer, polSupply, polEngi; // Polish
 let fraRifleW, fraOfficerW, fraSupplyW, fraEngiW; // French Winter
+
+// Environment Icons
+let tree, treeW, supplyDepot;
 
 function preload() {
   // Allied Flags
@@ -38,7 +47,7 @@ function preload() {
   warSong1 = loadSound("assets/sound/music/war/war1.ogg");
   warSong2 = loadSound("assets/sound/music/war/war2.ogg");
   warSong3 = loadSound("assets/sound/music/war/war3.ogg");
-  warFinale = loadSound("assets/sound/music/war/warFinale.ogg");
+  warFinale = loadSound("assets/sound/music/war/warFinale.ogg"); // War song that only plays when a side is about to win
   menuSong = loadSound("assets/sound/music/menuSong.ogg");
 
   // Soviet Voice Lines
@@ -59,11 +68,16 @@ function preload() {
   ukHelmet = loadImage("assets/icons/units/infantryUK.png");
   ukHelmetD = loadImage("assets/icons/units/infantryUKD.png");
 
-  // Tank Icons
-  sovArmW = loadImage("assets/icons/units/tankWSov.png");
-  gerArmW = loadImage("assets/icons/units/tankWGer.png");
-  genArmW = loadImage("assets/icons/units/tankWMil.png");
-  
+  // Mortar Icons
+  sovMortI = loadImage("assets/icons/units/mortSov.png");
+  gerMortI = loadImage("assets/icons/units/mortGer.png");
+  genMortI = loadImage("assets/icons/units/mortGen.png");
+
+  // AT Artillery Icons
+  sovATI = loadImage("assets/icons/units/atSov.png");
+  gerATI = loadImage("assets/icons/units/atGer.png");
+  genATI = loadImage("assets/icons/units/atGen.png");
+
   // Truck Icons
   sovTruck = loadImage("assets/icons/units/truckSov.png");
   gerTruck = loadImage("assets/icons/units/truckGer.png");
@@ -75,6 +89,16 @@ function preload() {
   gerEngi = loadImage("assets/icons/units/engiGer.png");
   polEngiT = loadImage("assets/icons/units/engiPol.png");
   genEngi = loadImage("assets/icons/units/engiGen.png");
+  
+  // Half-Track Icons
+  sovAPCI = loadImage("assets/icons/units/apcSov.png");
+  gerAPCI = loadImage("assets/icons/units/apcGer.png");
+  genAPCI = loadImage("assets/icons/units/apcGen.png");
+  
+  // Tank Icons
+  sovArmW = loadImage("assets/icons/units/tankWSov.png");
+  gerArmW = loadImage("assets/icons/units/tankWGer.png");
+  genArmW = loadImage("assets/icons/units/tankWMil.png");
 
   // Soviet Portraits - Winter
   sovRifleW = loadImage("assets/icons/unitsPortraits/sovW/sovRifleman.png");
@@ -144,4 +168,9 @@ function preload() {
   fraOfficerW = loadImage("assets/icons/unitsPortraits/fraW/fraOfficer.png");
   fraSupplyW = loadImage("assets/icons/unitsPortraits/fraW/fraSupply.png");
   fraEngiW = loadImage("assets/icons/unitsPortraits/fraW/fraEngi.png");
+
+  // Environment Objects
+  tree = loadImage("assets/icons/environment/tree.png");
+  treeW = loadImage("assets/icons/environment/treeSnow.png");
+  supplyDepot = loadImage("assets/icons/environment/supplyDepot.png");
 }
