@@ -47,13 +47,6 @@ function preload() {
   flagPoland = loadImage("assets/icons/flags/neutral/flagPoland.png");
   flagFrance = loadImage("assets/icons/flags/neutral/flagFrance.png");
 
-  // Music
-  warSong1 = loadSound("assets/sound/music/war/war1.ogg");
-  warSong2 = loadSound("assets/sound/music/war/war2.ogg");
-  warSong3 = loadSound("assets/sound/music/war/war3.ogg");
-  warFinale = loadSound("assets/sound/music/war/warFinale.ogg"); // War song that only plays when a side is about to win
-  menuSong = loadSound("assets/sound/music/menuSong.ogg");
-
   // Soviet Voice Lines
   sovSelect = loadSound("assets/sound/voice/sovSelected.wav");
   sovAction = loadSound("assets/sound/voice/sovAction.wav");
@@ -121,7 +114,7 @@ function preload() {
   sovSupplyW = loadImage("assets/icons/unitsPortraits/sovW/sovSupply.png");
   sovEngiW = loadImage("assets/icons/unitsPortraits/sovW/sovEngi.png");
   sovMortW = loadImage("assets/icons/unitsPortraits/sovW/sovMortar.png");
-  sovATArtW = loadImage("assets/icons/unitsPortraits/sovW/sovATArt.png");
+  sovATArtW = loadImage("assets/icons/unitsPortraits/sovW/SovATArt.png");
   sovAPCW = loadImage("assets/icons/unitsPortraits/sovW/sovAPC.png");
   sovTankW = loadImage("assets/icons/unitsPortraits/sovW/sovTank.png");
   sovFighterW = loadImage("assets/icons/unitsPortraits/sovW/sovFighter.png");
