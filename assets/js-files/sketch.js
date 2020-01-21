@@ -22,10 +22,13 @@ let terrainType = '';
 let editorMode;
 let playerCurrency;
 let enemyCurrency;
+let playerSide;
 const randBuilding = ['navalPort', 'landFort'];
 var mapData = {}
 const reader = new FileReader();
 let lastAdvance;
+let currentUnitIcon;
+let Volkhov;
 
 let gameStarted;
 let guiWidth, guiHeight;
@@ -45,6 +48,8 @@ function getTwoDArray(x, y)
 function setup() {
   createCanvas(windowWidth, windowHeight);
   background(50, 50, 50);
+  playerCurrency = 5000;
+  playerSide = "soviet";
 
   displayMenu();
   lastAdvance = millis();
@@ -55,13 +60,18 @@ function setup() {
 }
 
 function draw() {
-  if (millis() > lastAdvance+500)
+  if (gameStarted)
   {
-    lastAdvance = millis();
-    print("something");
-    for (let i = 0; i < divisions.length; i++)
+    checkUnitState()
+    if (millis() > lastAdvance+500)
     {
-      divisions[i].advance();
+      lastAdvance = millis();
+      displayMenu()
+      loadSectors();
+      for (let i = 0; i < divisions.length; i++)
+      {
+        divisions[i].advance();
+      }
     }
   }
 }
@@ -129,6 +139,8 @@ function generateWorld(json) {
         {
           envObjects.push(new EnvObject(cellSize, cellSize, new Vector2(x,y), 'tree'));
         }
+        buildings.push(new Building(cellSize, cellSize, new Vector2(13, 6), "base", "soviet"))
+        buildings.push(new Building(cellSize, cellSize, new Vector2(89, 36), "base", "german"))
       }
     }
     loadSectors();
@@ -145,8 +157,20 @@ function startGame () {
   
   gameStarted = true;
   background(0, 200, 200);
-  displayMenu()
+  displayMenu();
   loadSectors();
+}
+
+function checkUnitState()
+{
+  for(let i = 0; i < divisions.length; i++)
+  {
+    if (divisions[i].health <= 0)
+    {
+      sectors[divisions[i].index.x][divisions[i].index.y].currentDivision = null;
+      divisions.splice(i, 1);
+    }
+  }
 }
 
 function calledFromHTML() {

@@ -11,11 +11,55 @@ function displayMenu()
     fill(100, 100, 100);
     rect((cellSize*95), 0, guiWidth, height);
     rect(0, (cellSize*50), width, guiHeight);
+    fill(255);
+    textSize(20);
+    textAlign(LEFT);
+    text("Money: " + playerCurrency, 10, (cellSize*50) + 30);
+
+
+    if (currentUnitIcon === "infantry")
+    {
+      image(sovRifleW, (cellSize*95) + 10, 50, guiWidth - 20, guiWidth - 20)
+    }
+    if (currentUnitIcon === "truck")
+    {
+      image(sovSupplyW, (cellSize*95) + 10, 50, guiWidth - 20, guiWidth - 20)
+    }
+    if (currentUnitIcon === "tank")
+    {
+      image(sovTankW, (cellSize*95) + 10, 50, guiWidth - 20, guiWidth - 20)
+    }
+    if (currentUnitIcon === "engineer")
+    {
+      image(sovEngiW, (cellSize*95) + 10, 50, guiWidth - 20, guiWidth - 20)
+      fill(15);
+      text("B - Base (Cost: 500)", (cellSize*95) + 10, 50 + 200);
+      text("T - Trench (Cost: 10)", (cellSize*95) + 10, 50 + 220);
+    }
+    if (currentUnitSelected !== undefined)
+    {
+      if (currentUnitSelected.buildingType === "base")
+      {
+        fill(255);
+        textSize(15);
+        textAlign(LEFT);
+        text("E - Engineer (Cost: 25)", (cellSize*95) + 10, 50);
+        text("I - Infantry (Cost: 25)", (cellSize*95) + 10, 65);
+        text("T - Tank (Cost: 100)", (cellSize*95) + 10, 80);
+        text("S - Supply Truck (Cost: 40)", (cellSize*95) + 10, 95);
+      }
+    }
     stroke(1);
   }
   else {
     if (scene === 1)
     {
+      fill(255);
+      textAlign(CENTER);
+      textSize(30)
+      text("When loading a map make sure you get the map from 'assets/maps/Volkhov.json'", windowWidth/2, 100);
+      text("You are the Soviets/Red Team", windowWidth/2, 140);
+
       rectMode(CENTER);
       fill(100, 100, 100);
       rect(windowWidth/2, windowHeight/2 - 100, 400, 150);
@@ -45,22 +89,36 @@ function mousePressed() {
         let x = floor((mouseX) / cellSize);
         let y = floor((mouseY) / cellSize);
         print("x: " + x + " y: " + y);
-    
+
         if (currentUnitSelected !== undefined) {
-          if (sectors[x][y].currentDivision === null)
           {
-            if (currentUnitSelected.divisionType !== undefined && sectors[x][y].landType !== 'water') {
-              print(currentUnitSelected.divisionType + " moved");
-              currentUnitSelected.moveTo(x, y);
+            if (currentUnitSelected.divisionType !== undefined) {
+              if (currentUnitSelected.divisionType !== undefined && sectors[x][y].landType !== 'water') {
+                print(currentUnitSelected.divisionType + " moved");
+                currentUnitSelected.moveTo(x, y);
+              }
+              currentUnitSelected = undefined;
+              currentUnitIcon = undefined;
             }
           }
-          currentUnitSelected = undefined;
         }
         else if (x >= 0 && y >= 0 && x < 95 && y <50) {
           currentSector = sectors[x][y];
-          if (sectors[x][y].currentDivision) {
-            currentUnitSelected = sectors[x][y].currentDivision;
-            print(currentUnitSelected.divisionType + " selected");
+
+          if (sectors[x][y].currentDivision)
+          {
+            if (sectors[x][y].currentDivision.side === playerSide) {
+              currentUnitSelected = sectors[x][y].currentDivision;
+              currentUnitIcon = sectors[x][y].currentDivision.divisionType;
+              print(currentUnitSelected.divisionType + " selected");
+            }
+          }
+          else if (sectors[x][y].currentBuilding)
+          {
+            if (sectors[x][y].currentBuilding.side === playerSide || sectors[x][y].currentBuilding === "base") {
+              currentUnitSelected = sectors[x][y].currentBuilding;
+              print(currentUnitSelected.buildingType + " selected");
+            }
           }
         }
       }
@@ -100,64 +158,119 @@ function mousePressed() {
 
 function keyPressed()
 {
-  if (editorMode === 'terrain')
+  if (mode === "editor")
   {
-    if (key === 'p')
+    if (editorMode === 'terrain')
     {
-      terrainType = 'plains';
-    }
-    if (key === 'i')
-    {
-      terrainType = 'ice';
-    }
-    if (key === 'w')
-    {
-      terrainType = 'water';
-    }
-    if (key === 'f')
-    {
-      terrainType = 'forest';
-    }
-    if (key === 'c')
-    {
-      terrainType = 'concrete';
-    }
-    if (key === 's')
-    {
-      terrainType = 'snow';
-    }
-    if (key === 'b')
-    {
-      terrainType = 'beach';
-    }
-    if (key === 'l')
-    {
-      mapData.arr = getTwoDArray(95,50);
-      for(let i = 0; i < 95; i++)
+      if (key === 'p')
       {
-        for(let j = 0; j < 50; j++)
-        {
-          let obj = {
-            landtype: sectors[i][j].landType,
-          };
-          mapData.arr[i][j] = obj;
-          print(obj);
-        }
+        terrainType = 'plains';
       }
-      saveJSON(mapData, 'mapData.json');
+      if (key === 'i')
+      {
+        terrainType = 'ice';
+      }
+      if (key === 'w')
+      {
+        terrainType = 'water';
+      }
+      if (key === 'f')
+      {
+        terrainType = 'forest';
+      }
+      if (key === 'c')
+      {
+        terrainType = 'concrete';
+      }
+      if (key === 's')
+      {
+        terrainType = 'snow';
+      }
+      if (key === 'b')
+      {
+        terrainType = 'beach';
+      }
+      if (key === 'l')
+      {
+        mapData.arr = getTwoDArray(95,50);
+        for(let i = 0; i < 95; i++)
+        {
+          for(let j = 0; j < 50; j++)
+          {
+            let obj = {
+              landtype: sectors[i][j].landType,
+              unit: sectors[i][j].currentDivision.divisionType
+            };
+            mapData.arr[i][j] = obj;
+            print(obj);
+          }
+        }
+        saveJSON(mapData, 'mapData.json');
+      }
+      if (key === 'm')
+      {
+        switchEditorMode();
+        terrainType = '';
+      }
     }
-    if (key === 'm')
+    else if(editorMode === 'object')
     {
-      switchEditorMode();
-      terrainType = '';
+      if (key === 'm')
+      {
+        switchEditorMode();
+        terrainType = 'snow';
+      }
     }
   }
-  else if(editorMode === 'object')
+  else
   {
-    if (key === 'm')
+    if (currentUnitSelected.buildingType !== undefined)
     {
-      switchEditorMode();
-      terrainType = 'snow';
+      if (currentUnitSelected.buildingType === "base")
+      {
+        if (key === 'e')
+        {
+          playerCurrency = playerCurrency - 25;
+          currentUnitSelected.createUnit("engineer");
+          currentUnitSelected = undefined;
+        }
+        if (key === 'i')
+        {
+          playerCurrency = playerCurrency - 25;
+          currentUnitSelected.createUnit("infantry");
+          currentUnitSelected = undefined;
+        }
+        if (key === 't')
+        {
+          playerCurrency = playerCurrency - 25;
+          currentUnitSelected.createUnit("tank");
+          currentUnitSelected = undefined;
+        }
+        if (key === 's')
+        {
+          playerCurrency = playerCurrency - 25;
+          currentUnitSelected.createUnit("truck");
+          currentUnitSelected = undefined;
+        }
+      }
+    }
+    if (currentUnitSelected.divisionType !== undefined)
+    {
+      if (currentUnitSelected.divisionType === "engineer")
+      {
+        if (key === 'b')
+        {
+          playerCurrency = playerCurrency - 500;
+          currentUnitSelected.createBuild("base");
+          currentUnitSelected = undefined;
+        }
+        if (key === 't')
+        {
+          playerCurrency = playerCurrency - 10;
+          currentUnitSelected.createBuild("trench");
+          currentUnitSelected = undefined;
+        }
+      }
     }
   }
 }

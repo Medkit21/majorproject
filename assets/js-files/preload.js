@@ -21,6 +21,7 @@ let sovMortI, gerMortI, genMortI;
 let sovATI, gerATI, genATI;
 let sovAPCI, gerAPCI, genAPCI;
 let sovArmW, gerArmW, genArmW;
+let sovBoat, gerBoat, genBoat, resBoat;
 
 // Unit Portraits
 let sovRifleW, sovSmgW, sovATW, sovMgW, sovSniperW, sovNKVDW, sovPartisanW, sovSupplyW, sovEngiW, sovMortW, sovATArtW, sovAPCW, sovTankW, sovFighterW, sovBomberW; // Soviet Winter
@@ -29,6 +30,9 @@ let gerRifleW, gerSmgW, gerATW, gerMgW, gerSniperW, gerOfficerW, gerMedicW, gerS
 let polRifleW, polOfficerW, polSupplyW, polEngiW; // Polish Winter
 let polRifle, polOfficer, polSupply, polEngi; // Polish
 let fraRifleW, fraOfficerW, fraSupplyW, fraEngiW; // French Winter
+
+// Defence Icons
+let trench;
 
 // Environment Icons
 let tree, treeW, supplyDepot;
@@ -99,6 +103,12 @@ function preload() {
   sovArmW = loadImage("assets/icons/units/tankWSov.png");
   gerArmW = loadImage("assets/icons/units/tankWGer.png");
   genArmW = loadImage("assets/icons/units/tankWMil.png");
+  
+  // Tank Icons
+  sovBoat = loadImage("assets/icons/units/boatSov.png");
+  gerBoat = loadImage("assets/icons/units/boatGer.png");
+  genBoat = loadImage("assets/icons/units/boatGen.png");
+  resBoat = loadImage("assets/icons/units/boatMilitia.png");
 
   // Soviet Portraits - Winter
   sovRifleW = loadImage("assets/icons/unitsPortraits/sovW/sovRifleman.png");
@@ -168,6 +178,9 @@ function preload() {
   fraOfficerW = loadImage("assets/icons/unitsPortraits/fraW/fraOfficer.png");
   fraSupplyW = loadImage("assets/icons/unitsPortraits/fraW/fraSupply.png");
   fraEngiW = loadImage("assets/icons/unitsPortraits/fraW/fraEngi.png");
+
+  // Defences
+  trench = loadImage("assets/icons/buildings/defense/trench/trench4way.png")
 
   // Environment Objects
   tree = loadImage("assets/icons/environment/tree.png");

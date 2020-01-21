@@ -49,20 +49,20 @@ class Sector // Template for a Sector
 
     
     // Buildables
-    this.landForts = null;
+    this.currentBuilding = null;
     
     this.landType = landType;
   }
   update()
   {
     this.render();
-    if (this.landForts != null)
-    {
-      this.landForts.update();
-    }
     if (this.currentEnvObject != null)
     {
       this.currentEnvObject.update();
+    }
+    if (this.currentBuilding != null)
+    {
+      this.currentBuilding.update();
     }
     if (this.currentDivision != null)
     {
@@ -108,8 +108,13 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
     this.size = size;
     this.mp = mp;
     this.organization;
-    this.attack;
-    this.defense;
+    this.health;
+    this.lvl = 1;
+    this.xp = 0;
+    this.damage;
+    this.isArmored;
+    this.armor;
+    this.unitCost;
     this.index = index;
     this.divisionType = divisionType;
     this.side = side;
@@ -122,6 +127,128 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
     if (sectors[index.x][index.y].landType !== "water") {
       sectors[index.x][index.y].currentDivision = this;
     }
+
+    if (this.divisionType === "infantry" || this.divisionType === "smg" || this.divisionType === "at" || this.divisionType === "mg" || this.divisionType === "sniper" ||
+    this.divisionType === "cannon" || this.divisionType === "mortar" || this.divisionType === "apc" || this.divisionType === "tank" || this.divisionType === "truck" ||
+     this.divisionType === "engineer")
+     {
+       if (this.divisionType === "infantry")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 5*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 25;
+       }
+       else if (this.divisionType === "smg")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 7*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 45;
+       }
+       else if (this.divisionType === "at")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 3*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 50;
+       }
+       else if (this.divisionType === "mg")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 10*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 50;
+       }
+       else if (this.divisionType === "sniper")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 10*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 75;
+       }
+       else if (this.divisionType === "cannon")
+       {
+         this.health = 100 + (25*this.lvl);
+         this.damage = 20*this.lvl;
+         this.isArmored = true;
+         this.unitCost = 100;
+       }
+       else if (this.divisionType === "mortar")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 15*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 90;
+       }
+       else if (this.divisionType === "apc")
+       {
+         this.health = 125 + (25*this.lvl);
+         this.damage = 25*this.lvl;
+         this.armor = 5;
+         this.isArmored = true;
+         this.unitCost = 150;
+       }
+       else if (this.divisionType === "tank")
+       {
+         this.health = 200 + (25*this.lvl);
+         this.damage = 40*this.lvl;
+         this.armor = 10;
+         this.isArmored = true;
+         this.unitCost = 200;
+       }
+       else if (this.divisionType === "truck")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 0;
+         this.isArmored = false;
+         this.unitCost = 40;
+       }
+       else if (this.divisionType === "engineer")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 0;
+         this.isArmored = false;
+         this.unitCost = 25;
+       }
+     }
+    else
+    {
+      if (this.side === "soviet")
+      {
+        if (this.divisionType === "nkvd")
+        {
+          this.health = 50 + (25*this.lvl);
+          this.damage = 7*this.lvl;
+          this.isArmored = false;
+          this.unitCost = 60;
+        }
+        if (this.divisionType === "partisan")
+        {
+          this.health = 15 + (25*this.lvl);
+          this.damage = 3*this.lvl;
+          this.isArmored = false;
+          this.unitCost = 10;
+        }
+      }
+      if (this.side === "german")
+      {
+        if (this.divisionType === "officer")
+        {
+          this.health = 50 + (25*this.lvl);
+          this.damage = 7*this.lvl;
+          this.isArmored = false;
+          this.unitCost = 60;
+        }
+        if (this.divisionType === "medic")
+        {
+          this.health = 60 + (25*this.lvl);
+          this.damage = 2*this.lvl;
+          this.isArmored = false;
+          this.unitCost = 75;
+        }
+      }
+    }
   }
   shouldAdd()
   {
@@ -131,45 +258,206 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
   {
     this.render();
   }
-  action(direction)
-  {
-    if (direction === "up") {
-      this.move(0, -1);
-      this.render();
-    }
-    else if (direction === "down") {
-      this.move(0, 1);
-      this.render();
-    }
-    else if (direction === "left") {
-      this.move(-1, 0);
-      this.render();
-    }
-    else if (direction === "right") {
-      this.move(1, 0);
-      this.render();
-    }
-  }
   render()
   {
     if (this.side === 'soviet')
     {
-      if (this.divisionType === "infantry")
+      if (sectors[this.index.x][this.index.y].landType === "water" || sectors[this.index.x][this.index.y].landType === "ice")
       {
-        image(sovHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+        image(sovBoat, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
       }
-      else if (this.divisionType === "tank")
-      {
-        image(sovArmW, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      else{
+        if (this.divisionType === "infantry")
+        {
+          image(sovHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+        }
+        else if (this.divisionType === "truck")
+        {
+          image(sovTruck, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+        }
+        else if (this.divisionType === "tank")
+        {
+          image(sovArmW, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+        }
+        else if (this.divisionType === "engineer")
+        {
+          image(sovEngi, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+        }
       }
     }
     else if (this.side === 'german')
     {
-      image(gerHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      if (sectors[this.index.x][this.index.y].landType === "water" || sectors[this.index.x][this.index.y].landType === "ice")
+      {
+        image(gerBoat, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      }
+      else if (this.divisionType === "truck")
+      {
+        image(gerTruck, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      }
+      else
+      {
+        image(gerHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      }
     }
     else
     {
-      image(polHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      if (sectors[this.index.x][this.index.y].landType === "water" || sectors[this.index.x][this.index.y].landType === "ice")
+      {
+        image(resBoat, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      }
+      else if (this.divisionType === "truck")
+      {
+        image(polTruck, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      }
+      else
+      {
+        image(polHelmet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size);
+      }
+    }
+  }
+  checkLevel()
+  {
+    if (this.xp === 250)
+    {
+      this.xp = 0;
+      this.lvl = this.lvl + 1;
+      updateStats();
+    }
+  }
+  createBuild(building)
+  {
+    buildings.push(new Building(cellSize, cellSize, new Vector2(this.index.x, this.index.y), building, this.side));
+  }
+  updateStats()
+  {
+    if (this.divisionType === "infantry" || this.divisionType === "smg" || this.divisionType === "at" || this.divisionType === "mg" || this.divisionType === "sniper" ||
+    this.divisionType === "cannon" || this.divisionType === "mortar" || this.divisionType === "apc" || this.divisionType === "tank" || this.divisionType === "truck" ||
+     this.divisionType === "engineer")
+     {
+       if (this.divisionType === "infantry")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 5*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 25;
+       }
+       else if (this.divisionType === "smg")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 7*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 45;
+       }
+       else if (this.divisionType === "at")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 3*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 50;
+       }
+       else if (this.divisionType === "mg")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 10*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 50;
+       }
+       else if (this.divisionType === "sniper")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 10*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 75;
+       }
+       else if (this.divisionType === "cannon")
+       {
+         this.health = 100 + (25*this.lvl);
+         this.damage = 20*this.lvl;
+         this.isArmored = true;
+         this.unitCost = 100;
+       }
+       else if (this.divisionType === "mortar")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 15*this.lvl;
+         this.isArmored = false;
+         this.unitCost = 90;
+       }
+       else if (this.divisionType === "apc")
+       {
+         this.health = 125 + (25*this.lvl);
+         this.damage = 25*this.lvl;
+         this.armor = 5;
+         this.isArmored = true;
+         this.unitCost = 150;
+       }
+       else if (this.divisionType === "tank")
+       {
+         this.health = 200 + (25*this.lvl);
+         this.damage = 40*this.lvl;
+         this.armor = 10;
+         this.isArmored = true;
+         this.unitCost = 200;
+       }
+       else if (this.divisionType === "truck")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 0;
+         this.isArmored = false;
+         this.unitCost = 40;
+       }
+       else if (this.divisionType === "engineer")
+       {
+         this.health = 50 + (25*this.lvl);
+         this.damage = 0;
+         this.isArmored = false;
+         this.unitCost = 25;
+       }
+     }
+    else
+    {
+      if (this.side === "soviet")
+      {
+        if (this.divisionType === "nkvd")
+        {
+          this.health = 50 + (25*this.lvl);
+          this.damage = 7*this.lvl;
+          this.isArmored = false;
+          this.unitCost = 60;
+        }
+        if (this.divisionType === "partisan")
+        {
+          this.health = 15 + (25*this.lvl);
+          this.damage = 3*this.lvl;
+          this.isArmored = false;
+          this.unitCost = 10;
+        }
+      }
+      if (this.side === "german")
+      {
+        if (this.divisionType === "officer")
+        {
+          this.health = 50 + (25*this.lvl);
+          this.damage = 7*this.lvl;
+          this.isArmored = false;
+          this.unitCost = 60;
+        }
+        if (this.divisionType === "medic")
+        {
+          this.health = 60 + (25*this.lvl);
+          this.damage = 2*this.lvl;
+          this.isArmored = false;
+          this.unitCost = 75;
+        }
+      }
+    }
+  }
+  checkHealth()
+  {
+    if (this.health <= 0)
+    {
+      sectors[this.index.x][this.index.y].currentDivision = null;
     }
   }
   move(x, y)
@@ -201,15 +489,24 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
     if (sectors[this.index.x][this.index.y].landType === 'water' || sectors[this.index.x][this.index.y].landType === 'ice' || this.divisionType === "tank")
     {
       this.moveCounter = this.moveCounter + 1;
-      if(this.moveCounter == 2)
+      if(this.moveCounter >= 3)
       {
         this.move(Math.sign(this.goalX - this.index.x), Math.sign(this.goalY - this.index.y));
         this.moveCounter = 0;
       }
     }
-    else
+    else if (this.divisionType === "truck" || "engineer")
     {
       this.move(Math.sign(this.goalX - this.index.x), Math.sign(this.goalY - this.index.y));
+    }
+    else
+    {
+      this.moveCounter = this.moveCounter + 1;
+      if(this.moveCounter >= 2)
+      {
+        this.move(Math.sign(this.goalX - this.index.x), Math.sign(this.goalY - this.index.y));
+        this.moveCounter = 0;
+      }
     }
   }
   moveTo(x,y)
@@ -221,20 +518,15 @@ class Division // Land Units (Infantry, Cavalry, Tanks, etc)
 
 class Building // Buildings creatable by players and AI
 {
-  constructor(cellSize, size, index, buildingType, damage, side)
+  constructor(cellSize, size, index, buildingType, side)
   {
     this.cellSize = cellSize;
     this.size = size;
     this.index = index;
     this.buildingType = buildingType;
-    this.damage = damage;
     this.side = side;
 
-    if (this.buildingType === 'landFort') {
-      if (sectors[index.x][index.y].landType !== "beach" && sectors[index.x][index.y].landType !== "water") {
-        sectors[index.x][index.y].landForts = this;
-      }
-    }
+    sectors[index.x][index.y].currentBuilding = this;
   }
   update()
   {
@@ -242,20 +534,24 @@ class Building // Buildings creatable by players and AI
   }
   render()
   {
-    if(this.buildingType === 'landFort') {
-      if (sectors[this.index.x][this.index.y].currentDivision === null)
+    if (this.buildingType === 'base') 
+    {
+      if (this.side === "soviet")
       {
-        fill(255);
-        ellipseMode(CORNER);
-        ellipse(this.index.x * this.cellSize, this.index.y * this.cellSize + 4.5, this.size, this.size);
+        image(flagSoviet, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size)
       }
-      else
-      {
-        fill(0, 255, 0);
-        ellipseMode(CORNER);
-        ellipse(this.index.x * this.cellSize, this.index.y * this.cellSize + 4.5, this.size, this.size);
-      } 
+      else {
+        image(flagReich, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size)
+      }
     }
+    else if (this.buildingType === 'trench') 
+    {
+      image(trench, this.index.x * this.cellSize, this.index.y * this.cellSize, this.size, this.size)
+    }
+  }
+  createUnit(unit)
+  {
+    divisions.push(new Division(cellSize, cellSize, 1000, new Vector2(this.index.x + 1, this.index.y), unit, this.side));
   }
 }
 
